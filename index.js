@@ -1,6 +1,57 @@
 const Blueprint = require('factorio-blueprint');
 const seData = require('./data-raw-se.json');
 
+Blueprint.setEntityData({
+  'aai_strongbox_passive_provider':
+  {
+    type: 'item', // 'item', 'fluid', 'virtual', 'tile', or 'recipe'
+    width: 2,
+    height: 2,
+    recipe: true,
+    modules: 4,
+    inventorySize: 96, // How many slots this container has (such as a chest)
+    filterAmount: false, // Set to false for filter inserters which have filters but no "amounts" on the filters
+    directionType: false // true for underground belts
+  },
+  'glass' :
+  {
+    type: 'item',
+    recipe: true,
+    width: 1,
+    height: 1
+  },
+  'electric_motor' : {
+    type: 'item',
+    recipe: true,
+    width: 1,
+    height: 1
+  },
+  'concrete' : {
+    type: 'item',
+    width: 1,
+    height: 1,
+  },
+  'se_electric_boiler' : {
+    type: "item",
+    width: 3,
+    height: 2
+  },
+  "se_heat_shielding" : {
+    type: "item",
+    height: 1,
+    width: 1
+  },
+  "stone_tablet" : {
+    type: "item",
+    height: 1,
+    widht: 1
+  }
+});
+function humanize(string) {
+  let spaces = string.replaceAll('_', ' ');
+  return spaces.charAt(0).toUpperCase() + spaces.slice(1);
+}
+
 function getSeItem(name) {
   return seData.item[name.replaceAll("_", "-")];
 }
@@ -55,7 +106,7 @@ function getAllIngredients(itemNameArray) {
 function createAssemblerBlueprint(itemName, beltReturn = false){
   let obSet = getIngredients(itemName);
   const ob = new Blueprint();
-  ob.name = `${itemName} Assembler`;
+  ob.name = `${ humanize(itemName)} Assembler`;
   let lastChest;
   //for each ingredient in the recipe
   for (let j = 0; j< obSet.length; j++) {
@@ -89,40 +140,17 @@ function createAssemblerBlueprint(itemName, beltReturn = false){
   return ob;
 }
 
-const assemblers = ['explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel", "accumulator", "solar_panel"];
+const assemblers = ['storage_tank','steam_turbine','roboport', 'explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel", "accumulator", "solar_panel",
+"se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit"];
 let storedItems = getAllIngredients(assemblers);
+storedItems = storedItems.concat(['pipe', 'pipe_to_ground']);
 let inputItems = storedItems;
-console.log(storedItems);
+
 
 
 const bp = new Blueprint();
+bp.name = "Main Sorter";
 
-Blueprint.setEntityData({
-  'aai_strongbox_passive_provider':
-  {
-    type: 'item', // 'item', 'fluid', 'virtual', 'tile', or 'recipe'
-    width: 2,
-    height: 2,
-    recipe: true,
-    modules: 4,
-    inventorySize: 96, // How many slots this container has (such as a chest)
-    filterAmount: false, // Set to false for filter inserters which have filters but no "amounts" on the filters
-    directionType: false // true for underground belts
-  },
-  'glass' :
-  {
-    type: 'item',
-    recipe: true,
-    width: 1,
-    height: 1
-  },
-  'electric_motor' : {
-    type: 'item',
-    recipe: true,
-    width: 1,
-    height: 1
-  }
-});
 let startY = 1;
 let segment = 1;
 let flipped = false;
@@ -136,7 +164,13 @@ let boxNo = 0;
 //Start with some substations
 //make a constant combinator
 let totalCombinatorData = {};
-let totalCombinator = bp.createEntity('constant_combinator', {x : -1, y: startY - 1});
+let totalCombinators = [];
+for (let i = 0; i < Math.ceil(storedItems.length/18); i++) {
+  let combi = bp.createEntity('constant_combinator', {x : -1, y: startY - 1 - 2*i});
+  totalCombinators.push(combi);
+}
+
+
 
 let bpWidth = Math.ceil(storedItems.length / 16) * 18 + 2;
 
@@ -153,7 +187,7 @@ for (let i = 0; i <= bpWidth ; i += 18) {
 
   let substation = bp.createEntity('substation', { x: i, y: startY }, Blueprint.RIGHT);
     //connect first one to combinator
-  if (i == 0) substation.connect(totalCombinator, null, null, "rad");
+  if (i == 0) substation.connect(totalCombinators[0], null, null, "rad");
   if (lastSubstation) {
     substation.connect(lastSubstation, null, null, 'red');
     substation.connect(lastSubstation, null, null, 'green');
@@ -286,9 +320,16 @@ for (let i = 0; i < assemblers.length; i++) {
 
 // set the combinator state
 let i = 0;
+let c = 0;
+
 for (const [name, qty] of Object.entries(totalCombinatorData)) {
-  totalCombinator.setConstant(i, name, qty * -1);
+  let activeCombinater = totalCombinators[c];
+  activeCombinater.setConstant(i, name, qty * -1);
   i++;
+  if (i > 17 + 18*c) {
+    i = 0;
+    c++;
+  }
 }
 
 //Inserters for imported items
@@ -296,7 +337,7 @@ let inputBp = new Blueprint();
 inputBp.name = 'Input Row';
 let lastInserter;
 for (let i = 0; i < inputItems.length; i++) {
-  let name = inputItems[i];
+  let name =inputItems[i];
   let stackSize = getSeItem(name).stack_size;
   inputBp.createEntity('fast_transport_belt', {x: i, y: -1}, Blueprint.RIGHT);
   let inputInserter = inputBp.createEntity('stack_filter_inserter', {x: i, y: 0}, Blueprint.DOWN);
@@ -306,7 +347,7 @@ for (let i = 0; i < inputItems.length; i++) {
   }
   inputInserter.setCondition({
     left: name,
-    right: stackSize * 10,
+    right: stackSize * 5,
     operator: '<'
   });
   inputBp.createEntity('fast_transport_belt', {x: i, y: 1}, Blueprint.UP);
