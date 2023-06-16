@@ -1,6 +1,10 @@
 const Blueprint = require('factorio-blueprint');
 const seData = require('./data-raw-se.json');
 
+
+const assemblers = ["accumulator", "solar_panel", 'storage_tank','steam_turbine','roboport', 'explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel", 
+"se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit", "laser_turret", "se_meteor_defence_ammo", "rail", "iron_stick"]; 
+
 Blueprint.setEntityData({
   'aai_strongbox_passive_provider':
   {
@@ -37,6 +41,11 @@ Blueprint.setEntityData({
     height: 2
   },
   "se_heat_shielding" : {
+    type: "item",
+    height: 1,
+    width: 1
+  },
+  "se_meteor_defence_ammo" : {
     type: "item",
     height: 1,
     width: 1
@@ -140,10 +149,9 @@ function createAssemblerBlueprint(itemName, beltReturn = false){
   return ob;
 }
 
-const assemblers = ['storage_tank','steam_turbine','roboport', 'explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel", "accumulator", "solar_panel",
-"se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit"];
 let storedItems = getAllIngredients(assemblers);
-storedItems = storedItems.concat(['pipe', 'pipe_to_ground']);
+storedItems = storedItems; //.concat(['pipe', 'pipe_to_ground']);
+console.log(storedItems);
 let inputItems = storedItems;
 
 
