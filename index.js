@@ -121,14 +121,26 @@ function createAssemblerBlueprint(itemName, beltReturn = false) {
 
   let lastChest;
   //for each ingredient in the recipe
-  for (let j = 0; j < obSet.length; j++) {
+  let j;
+  for (j = 0; j < obSet.length; j++) {
+    let xPos = (j == 4)? j+1 : j;
     combinator.setConstant(j, obSet[j], (getSeItem(obSet[j]).stack_size * -1) + 10);
-    let chest = ob.createEntity('steel_chest', { x: j, y: 0 });
+    let chest = ob.createEntity('steel_chest', { x: xPos, y: 0 });
     chest.setBar(1);
-    let sfi = ob.createEntity('stack_filter_inserter', { x: j, y: 1 }, Blueprint.DOWN);
-    ob.createEntity('fast_inserter', { x: j, y: -1 }, Blueprint.DOWN);
+    let sfi = ob.createEntity('stack_filter_inserter', { x: xPos, y: 1 }, Blueprint.DOWN);
+    ob.createEntity('fast_inserter', { x: xPos, y: -1 }, Blueprint.DOWN);
 
     sfi.setFilter(0, obSet[j]);
+    // wider than assembler
+    if(j == 3){
+      ob.createEntity("fast_transport_belt", {x: xPos, y: -2}, Blueprint.RIGHT);
+      ob.createEntity("fast_transport_belt", {x: xPos+1, y: -2}, Blueprint.UP);
+      ob.createEntity("fast_transport_belt", {x: xPos+1, y: -3}, Blueprint.UP);
+      ob.createEntity("fast_inserter", {x: xPos, y: -3}, Blueprint.RIGHT);
+    }
+    if(j == 4){
+      ob.createEntity("fast_transport_belt", {x: xPos, y: -2}, Blueprint.LEFT);
+    }
 
     //if there is another chest in this group connect to it with red wire
     if (lastChest) {
@@ -136,8 +148,9 @@ function createAssemblerBlueprint(itemName, beltReturn = false) {
     }
 
     //increase the combinator totals
-    lastChest = chest
+    lastChest = chest;
   }
+
   let machine = ob.createEntity('assembling_machine_2', { x: 0, y: -4 });
   machine.setRecipe(itemName);
   //add a power pole for easy connections
@@ -146,8 +159,9 @@ function createAssemblerBlueprint(itemName, beltReturn = false) {
 
   combinator.connect(pole, null, null, "red");
 
-  let returnPos, returnDirection;
+  let returnPos;
   if (beltReturn) {
+    if (obSet.length > 3) return;
     //place it under the assembler if there's room, next to it if not
     if (obSet.length < 3) {
       returnPos =  2; 
@@ -168,13 +182,17 @@ function createAssemblerBlueprint(itemName, beltReturn = false) {
       
     }
     //output arm
-    ob.createEntity("fast_inserter", {x: 2, y: -5}, Blueprint.DOWN);
     ob.createEntity('stack_inserter', { x: returnPos, y: 1 }, Blueprint.UP).connect(pole, null, null, "green").setCondition({
       left: itemName,
       right: getSeItem(itemName).stack_size * 5,
       operator: "<"
     });
+  } else {
+    ob.createEntity("logistic_chest_passive_provider", {x: 2, y: -6}).setBar(1);
+
   }
+  ob.createEntity("fast_inserter", {x: 2, y: -5}, Blueprint.DOWN);
+  
   return ob;
 }
 
@@ -342,7 +360,12 @@ let obPrints = [];
 //make assemblers here
 for (let i = 0; i < assemblers.length; i++) {
   let objOutput = storedItems.includes(assemblers[i]) ? true : false;
-  obPrints.push(createAssemblerBlueprint(assemblers[i], objOutput));
+  try {
+    obPrints.push(createAssemblerBlueprint(assemblers[i], objOutput));
+  } catch (e) {
+    console.log(e);
+    console.log(`Building ${assemblers[i]}`);
+  }
 }
 
 //********** Import Row *************/
