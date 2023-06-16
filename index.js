@@ -2,8 +2,8 @@ const Blueprint = require('factorio-blueprint');
 const seData = require('./data-raw-se.json');
 
 
-const assemblers = ["accumulator", "solar_panel", 'storage_tank','steam_turbine','roboport', 'explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel", 
-"se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit", "laser_turret", "se_meteor_defence_ammo", "rail", "iron_stick"]; 
+const assemblers = ["accumulator", "solar_panel", 'storage_tank', 'steam_turbine', 'roboport', 'explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel",
+  "se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit", "laser_turret", "se_meteor_defence_ammo", "rail", "iron_stick", "stone_tablet"];
 
 Blueprint.setEntityData({
   'aai_strongbox_passive_provider':
@@ -17,45 +17,46 @@ Blueprint.setEntityData({
     filterAmount: false, // Set to false for filter inserters which have filters but no "amounts" on the filters
     directionType: false // true for underground belts
   },
-  'glass' :
+  'glass':
   {
     type: 'item',
     recipe: true,
     width: 1,
     height: 1
   },
-  'electric_motor' : {
+  'electric_motor': {
     type: 'item',
     recipe: true,
     width: 1,
     height: 1
   },
-  'concrete' : {
+  'concrete': {
     type: 'item',
     width: 1,
     height: 1,
   },
-  'se_electric_boiler' : {
+  'se_electric_boiler': {
     type: "item",
     width: 3,
     height: 2
   },
-  "se_heat_shielding" : {
+  "se_heat_shielding": {
     type: "item",
     height: 1,
     width: 1
   },
-  "se_meteor_defence_ammo" : {
+  "se_meteor_defence_ammo": {
     type: "item",
     height: 1,
     width: 1
   },
-  "stone_tablet" : {
+  "stone_tablet": {
     type: "item",
     height: 1,
     widht: 1
   }
 });
+
 function humanize(string) {
   let spaces = string.replaceAll('_', ' ');
   return spaces.charAt(0).toUpperCase() + spaces.slice(1);
@@ -74,16 +75,16 @@ function getIngredients(itemName) {
   let fullIngredients;
   let ingredients = new Set();
   if (!recipe.ingredients) {
-    fullIngredients =  recipe.normal.ingredients;
+    fullIngredients = recipe.normal.ingredients;
   } else {
     fullIngredients = recipe.ingredients;
-  } 
+  }
   for (let j = 0; j < fullIngredients.length; j++) {
     try {
       // sometimes we get an objet with a name property
       if (fullIngredients[j].name) {
         ingredients.add(fullIngredients[j].name.replaceAll('-', '_'));
-      // other times it's just an array
+        // other times it's just an array
       } else {
         ingredients.add(fullIngredients[j][0].replaceAll('-', '_'));
       }
@@ -91,7 +92,7 @@ function getIngredients(itemName) {
       console.log(e);
       console.log(recipe);
     }
-  
+
   }
   return Array.from(ingredients);
 }
@@ -112,17 +113,20 @@ function getAllIngredients(itemNameArray) {
 }
 
 // creates the storage boxes and assembler for an item, optionally creates a return to the main belt
-function createAssemblerBlueprint(itemName, beltReturn = false){
+function createAssemblerBlueprint(itemName, beltReturn = false) {
   let obSet = getIngredients(itemName);
   const ob = new Blueprint();
-  ob.name = `${ humanize(itemName)} Assembler`;
+  ob.name = `${humanize(itemName)} Assembler`;
+  let combinator = ob.createEntity("constant_combinator", { x: 1, y: -5 });
+
   let lastChest;
   //for each ingredient in the recipe
-  for (let j = 0; j< obSet.length; j++) {
-    let chest = ob.createEntity('steel_chest', { x: j, y: 0});
+  for (let j = 0; j < obSet.length; j++) {
+    combinator.setConstant(j, obSet[j], (getSeItem(obSet[j]).stack_size * -1) + 10);
+    let chest = ob.createEntity('steel_chest', { x: j, y: 0 });
     chest.setBar(1);
-    let sfi = ob.createEntity('stack_filter_inserter', {x: j, y: 1}, Blueprint.DOWN);
-    ob.createEntity('fast_inserter', {x: j, y: -1}, Blueprint.DOWN);
+    let sfi = ob.createEntity('stack_filter_inserter', { x: j, y: 1 }, Blueprint.DOWN);
+    ob.createEntity('fast_inserter', { x: j, y: -1 }, Blueprint.DOWN);
 
     sfi.setFilter(0, obSet[j]);
 
@@ -132,26 +136,50 @@ function createAssemblerBlueprint(itemName, beltReturn = false){
     }
 
     //increase the combinator totals
-    if (totalCombinatorData[obSet[j]]) {
-      totalCombinatorData[obSet[j]] +=  getSeItem(obSet[j]).stack_size;
-    } else {
-      totalCombinatorData[obSet[j]] =  getSeItem(obSet[j]).stack_size;
-    }
     lastChest = chest
   }
-  let machine = ob.createEntity('assembling_machine_2', {x: 0, y: -4});
+  let machine = ob.createEntity('assembling_machine_2', { x: 0, y: -4 });
   machine.setRecipe(itemName);
-  if (beltReturn) ob.createEntity('stack_inserter', {x: -1, y: 0}).connect(lastChest, null, null, "green").setCondition({
-    left: itemName,
-    right: getSeItem(obSet[j]).stack_size * 10,
-    operator: "<"
-  });
+  //add a power pole for easy connections
+  let pole = ob.createEntity("medium_electric_pole", { x: 0, y: -5 });
+  pole.connect(lastChest, null, null, "red");
+
+  combinator.connect(pole, null, null, "red");
+
+  let returnPos, returnDirection;
+  if (beltReturn) {
+    //place it under the assembler if there's room, next to it if not
+    if (obSet.length < 3) {
+      returnPos =  2; 
+      ob.createEntity("fast_underground_belt", {x : returnPos, y: -6}, Blueprint.DOWN);
+      ob.createEntity("fast_underground_belt", {x : returnPos, y: -1}, Blueprint.DOWN).setDirectionType("output");
+      ob.createEntity("fast_transport_belt", {x: returnPos, y: 0}, Blueprint.DOWN);
+
+    } else {
+      returnPos = 3;
+      //return belt
+
+        ob.createEntity("fast_transport_belt", {x: 2, y: -6}, Blueprint.RIGHT);
+        
+        ob.createEntity("fast_transport_belt", {x: 3, y: -6}, Blueprint.DOWN);
+      for (let yPos = -5; yPos < 1; yPos++){
+        ob.createEntity("fast_transport_belt", {x: returnPos, y: yPos}, Blueprint.DOWN);
+      }
+      
+    }
+    //output arm
+    ob.createEntity("fast_inserter", {x: 2, y: -5}, Blueprint.DOWN);
+    ob.createEntity('stack_inserter', { x: returnPos, y: 1 }, Blueprint.UP).connect(pole, null, null, "green").setCondition({
+      left: itemName,
+      right: getSeItem(itemName).stack_size * 5,
+      operator: "<"
+    });
+  }
   return ob;
 }
 
 let storedItems = getAllIngredients(assemblers);
 storedItems = storedItems; //.concat(['pipe', 'pipe_to_ground']);
-console.log(storedItems);
 let inputItems = storedItems;
 
 
@@ -170,19 +198,10 @@ let lastSb;
 
 let boxNo = 0;
 //Start with some substations
-//make a constant combinator
-let totalCombinatorData = {};
-let totalCombinators = [];
-for (let i = 0; i < Math.ceil(storedItems.length/18); i++) {
-  let combi = bp.createEntity('constant_combinator', {x : -1, y: startY - 1 - 2*i});
-  totalCombinators.push(combi);
-}
-
-
 
 let bpWidth = Math.ceil(storedItems.length / 16) * 18 + 2;
 
-for (let i = 0; i <= bpWidth ; i += 18) {
+for (let i = 0; i <= bpWidth; i += 18) {
 
   flipped = (segment % 2 == 0) ? true : false;
   let lastSegment = (i + 18 < bpWidth) ? false : true;
@@ -190,12 +209,11 @@ for (let i = 0; i <= bpWidth ; i += 18) {
   let bottomDirection = flipped ? Blueprint.LEFT : Blueprint.RIGHT;
   let midDirection = flipped ? Blueprint.DOWN : Blueprint.UP;
 
-  bp.createEntity('fast_underground_belt', { x: i, y: startY - 1} , Blueprint.DOWN);
-  bp.createEntity('fast_underground_belt', { x: i+1, y: startY - 1} , Blueprint.DOWN);
+  bp.createEntity('fast_underground_belt', { x: i, y: startY - 1 }, Blueprint.DOWN);
+  bp.createEntity('fast_underground_belt', { x: i + 1, y: startY - 1 }, Blueprint.DOWN);
 
   let substation = bp.createEntity('substation', { x: i, y: startY }, Blueprint.RIGHT);
-    //connect first one to combinator
-  if (i == 0) substation.connect(totalCombinators[0], null, null, "rad");
+  //connect first one to combinator
   if (lastSubstation) {
     substation.connect(lastSubstation, null, null, 'red');
     substation.connect(lastSubstation, null, null, 'green');
@@ -206,48 +224,48 @@ for (let i = 0; i <= bpWidth ; i += 18) {
   }
 
   if (flipped) {
-    bp.createEntity('fast_underground_belt', { x: i, y: startY + 2} , Blueprint.DOWN).setDirectionType('output');
-    bp.createEntity('fast_underground_belt', { x: i+1, y: startY + 2} , Blueprint.DOWN).setDirectionType('output');
+    bp.createEntity('fast_underground_belt', { x: i, y: startY + 2 }, Blueprint.DOWN).setDirectionType('output');
+    bp.createEntity('fast_underground_belt', { x: i + 1, y: startY + 2 }, Blueprint.DOWN).setDirectionType('output');
   } else {
-    bp.createEntity('fast_underground_belt', { x: i, y: startY + 2} , Blueprint.UP);
-    bp.createEntity('fast_underground_belt', { x: i+1, y: startY + 2} , Blueprint.UP);
+    bp.createEntity('fast_underground_belt', { x: i, y: startY + 2 }, Blueprint.UP);
+    bp.createEntity('fast_underground_belt', { x: i + 1, y: startY + 2 }, Blueprint.UP);
   }
-    // Put 2x2 boxes between them
+  // Put 2x2 boxes between them
 
   if (!lastSegment) {
-    for (let j = 2; j < 18; j +=2 ) {
+    for (let j = 2; j < 18; j += 2) {
 
-      let bottomBox = bp.createEntity('aai_strongbox_passive_provider', { x: j + i, y: startY + 1}, Blueprint.RIGHT);
-      let topBox = bp.createEntity('aai_strongbox_passive_provider', { x: j + i, y: startY - 1}, Blueprint.RIGHT);
-      
+      let bottomBox = bp.createEntity('aai_strongbox_passive_provider', { x: j + i, y: startY + 1 }, Blueprint.RIGHT);
+      let topBox = bp.createEntity('aai_strongbox_passive_provider', { x: j + i, y: startY - 1 }, Blueprint.RIGHT);
+
       if (j < 4) {
 
         topBox.connect(substation, null, null, 'green');
         bottomBox.connect(substation, null, null, 'green');
 
-    } else {
-      bottomBox.connect(lastBottom, null, null, 'green');
-      topBox.connect(lastTop, null, null, "green");
-    }
-    lastBottom = bottomBox;
-    lastTop = topBox;
+      } else {
+        bottomBox.connect(lastBottom, null, null, 'green');
+        topBox.connect(lastTop, null, null, "green");
+      }
+      lastBottom = bottomBox;
+      lastTop = topBox;
 
-    //inserters
+      //inserters
       if (flipped) {
         sfbx = j + i;
         sftx = j + i + 1;
         stx = j + i;
-        sbx = j + i  + 1;
+        sbx = j + i + 1;
       } else {
         sfbx = j + i + 1;
         sftx = j + i;
-        stx = j + i  + 1;
+        stx = j + i + 1;
         sbx = j + i;
       }
 
       let sfb = bp.createEntity('stack_filter_inserter', { x: sfbx, y: startY + 3 }, Blueprint.DOWN);
       let sb = bp.createEntity('stack_inserter', { x: sbx, y: startY + 3 }, Blueprint.UP);
-      
+
       if (boxNo < storedItems.length) {
         let itemName = storedItems[boxNo];
         sfb.setFilter(0, itemName);
@@ -261,7 +279,7 @@ for (let i = 0; i <= bpWidth ; i += 18) {
 
       itemName = storedItems[boxNo];
       let sft = bp.createEntity('stack_filter_inserter', { x: sftx, y: startY - 2 }, Blueprint.UP);
-      let st = bp.createEntity('stack_inserter', { x: stx, y: startY -2 }, Blueprint.DOWN);
+      let st = bp.createEntity('stack_inserter', { x: stx, y: startY - 2 }, Blueprint.DOWN);
       if (boxNo < storedItems.length) {
         sft.setFilter(0, itemName);
         st.setCondition({
@@ -283,36 +301,36 @@ for (let i = 0; i <= bpWidth ; i += 18) {
       lastSt = st;
 
     }
- 
-  // Add belts
+
+    // Add belts
 
 
     for (let k = 2; k < 18; k++) {
-      bp.createEntity('fast_transport_belt', { x: k + i, y: 5}, topDirection);
-      bp.createEntity('fast_transport_belt', { x: k + i, y: -2}, bottomDirection);
+      bp.createEntity('fast_transport_belt', { x: k + i, y: 5 }, topDirection);
+      bp.createEntity('fast_transport_belt', { x: k + i, y: -2 }, bottomDirection);
 
     }
-  
- 
-}
-if (!flipped) {
-  bp.createEntity('fast_transport_belt', { x: 1 + i, y: -2}, Blueprint.RIGHT);
-  bp.createEntity('fast_transport_belt', { x: i, y: -2}, Blueprint.LEFT);
-  bp.createEntity('fast_transport_belt', { x: i, y: 5}, midDirection);
-  bp.createEntity('fast_transport_belt', { x: 1 + i, y: 5}, midDirection);
-} else {
-  bp.createEntity('fast_transport_belt', { x: 1 + i, y: -2}, midDirection);
-  bp.createEntity('fast_transport_belt', { x: i, y: -2}, midDirection);
-  bp.createEntity('fast_transport_belt', { x: i, y: 5}, Blueprint.LEFT);
-  bp.createEntity('fast_transport_belt', { x: 1 + i, y: 5}, Blueprint.RIGHT);
-}
 
 
-bp.createEntity('fast_transport_belt', { x: 1 + i, y: -1}, midDirection);
+  }
+  if (!flipped) {
+    bp.createEntity('fast_transport_belt', { x: 1 + i, y: -2 }, Blueprint.RIGHT);
+    bp.createEntity('fast_transport_belt', { x: i, y: -2 }, Blueprint.LEFT);
+    bp.createEntity('fast_transport_belt', { x: i, y: 5 }, midDirection);
+    bp.createEntity('fast_transport_belt', { x: 1 + i, y: 5 }, midDirection);
+  } else {
+    bp.createEntity('fast_transport_belt', { x: 1 + i, y: -2 }, midDirection);
+    bp.createEntity('fast_transport_belt', { x: i, y: -2 }, midDirection);
+    bp.createEntity('fast_transport_belt', { x: i, y: 5 }, Blueprint.LEFT);
+    bp.createEntity('fast_transport_belt', { x: 1 + i, y: 5 }, Blueprint.RIGHT);
+  }
 
 
-bp.createEntity('fast_splitter', { x: i, y: 4}, midDirection);
-bp.createEntity('fast_transport_belt', { x: i, y: -1}, midDirection);
+  bp.createEntity('fast_transport_belt', { x: 1 + i, y: -1 }, midDirection);
+
+
+  bp.createEntity('fast_splitter', { x: i, y: 4 }, midDirection);
+  bp.createEntity('fast_transport_belt', { x: i, y: -1 }, midDirection);
   lastSubstation = substation;
   segment++;
 }
@@ -323,32 +341,20 @@ bp.fixCenter();
 let obPrints = [];
 //make assemblers here
 for (let i = 0; i < assemblers.length; i++) {
-  obPrints.push(createAssemblerBlueprint(assemblers[i]));
+  let objOutput = storedItems.includes(assemblers[i]) ? true : false;
+  obPrints.push(createAssemblerBlueprint(assemblers[i], objOutput));
 }
 
-// set the combinator state
-let i = 0;
-let c = 0;
-
-for (const [name, qty] of Object.entries(totalCombinatorData)) {
-  let activeCombinater = totalCombinators[c];
-  activeCombinater.setConstant(i, name, qty * -1);
-  i++;
-  if (i > 17 + 18*c) {
-    i = 0;
-    c++;
-  }
-}
-
-//Inserters for imported items
+//********** Import Row *************/
+// Inserters for imported items
 let inputBp = new Blueprint();
 inputBp.name = 'Input Row';
 let lastInserter;
 for (let i = 0; i < inputItems.length; i++) {
-  let name =inputItems[i];
+  let name = inputItems[i];
   let stackSize = getSeItem(name).stack_size;
-  inputBp.createEntity('fast_transport_belt', {x: i, y: -1}, Blueprint.RIGHT);
-  let inputInserter = inputBp.createEntity('stack_filter_inserter', {x: i, y: 0}, Blueprint.DOWN);
+  inputBp.createEntity('fast_transport_belt', { x: i, y: -1 }, Blueprint.RIGHT);
+  let inputInserter = inputBp.createEntity('stack_filter_inserter', { x: i, y: 0 }, Blueprint.DOWN);
   inputInserter.setFilter(0, name);
   if (lastInserter) {
     inputInserter.connect(lastInserter, null, null, "green");
@@ -358,7 +364,7 @@ for (let i = 0; i < inputItems.length; i++) {
     right: stackSize * 5,
     operator: '<'
   });
-  inputBp.createEntity('fast_transport_belt', {x: i, y: 1}, Blueprint.UP);
+  inputBp.createEntity('fast_transport_belt', { x: i, y: 1 }, Blueprint.UP);
   lastInserter = inputInserter;
 }
 obPrints.push(inputBp);
