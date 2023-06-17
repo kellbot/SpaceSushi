@@ -3,7 +3,8 @@ const seData = require('./data-raw-se.json');
 
 
 const assemblers = ["accumulator", "solar_panel", 'storage_tank', 'steam_turbine', 'roboport', 'explosive_cannon_shell', 'radar', 'electric_motor', "copper_cable", "iron_gear_wheel",
-  "se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit", "laser_turret", "se_meteor_defence_ammo", "rail", "iron_stick", "stone_tablet"];
+  "se_electric_boiler", "se_heat_shielding", "electronic_circuit", "advanced_circuit", "laser_turret", "se_meteor_defence_ammo", "rail", "iron_stick", "stone_tablet",
+"small_iron_electric_pole", "medium_electric_pole", "fast_transport_belt", "electric_mining_drill", "transport_belt", "motor"];
 
 Blueprint.setEntityData({
   'aai_strongbox_passive_provider':
@@ -51,6 +52,16 @@ Blueprint.setEntityData({
     width: 1
   },
   "stone_tablet": {
+    type: "item",
+    height: 1,
+    widht: 1
+  },
+  "small_iron_electric_pole": {
+    type: "item",
+    height: 1,
+    widht: 1
+  },
+  "motor": {
     type: "item",
     height: 1,
     widht: 1
