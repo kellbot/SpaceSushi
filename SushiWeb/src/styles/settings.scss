@@ -8,9 +8,18 @@
 // @use 'vuetify/settings' with (
 //   $color-pack: false
 // );
+$icon-size: 64px;
+$bg-size: 1984px;
 .itemImage {
-    background-image: url("/icons/icons-vanilla.webp");
-    background-size: 626px;
-    width: 32px;
-    height: 32px;
+    background-image: url("/icons.png");
+    background-size: $bg-size;
+    width: $icon-size;
+    height: $icon-size !important;
+    // display: block;
+    padding:0;
+    margin: 2px;
+    opacity: 0.5;
+}
+.item-selected {
+    opacity: 1;
 }
