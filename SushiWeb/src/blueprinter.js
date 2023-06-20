@@ -1,98 +1,15 @@
 import Blueprint from 'factorio-blueprint';
 import seData from './assets/data.json';
+import seBlueprintData from './assets/blueprintData.json';
 
+// eslint-disable-next-line no-unused-vars
 let i1x1 = {
   type: "item",
   height: 1,
   width: 1
 }
 
-Blueprint.setEntityData({
-  'chemical_plant': {
-    type: 'item',
-    width: 3,
-    height: 3,
-    recipe:true,
-    modules: 3,
-  },
-  'sand': i1x1,
-  'se_energy_beam_defence': i1x1,
-  'aai_strongbox_passive_provider':
-  {
-    type: 'item', // 'item', 'fluid', 'virtual', 'tile', or 'recipe'
-    width: 2,
-    height: 2,
-    inventorySize: 96, // How many slots this container has (such as a chest)
-    filterAmount: false, // Set to false for filter inserters which have filters but no "amounts" on the filters
-    directionType: false // true for underground belts
-  },
-
-  'aai_strongbox':
-  {
-    type: 'item', // 'item', 'fluid', 'virtual', 'tile', or 'recipe'
-    width: 2,
-    height: 2,
-    inventorySize: 96, // How many slots this container has (such as a chest)
-  },
-  'aai_strongbox_storage':
-  {
-    type: 'item', // 'item', 'fluid', 'virtual', 'tile', or 'recipe'
-    width: 2,
-    height: 2,
-    inventorySize: 96, // How many slots this container has (such as a chest)
-    filterAmount: false, // Set to false for filter inserters which have filters but no "amounts" on the filters
-  },
-  "cliff_explosives": i1x1,
-  "artillery_shell": i1x1,
-  'glass':
-  {
-    type: 'item',
-    recipe: true,
-    width: 1,
-    height: 1
-  },
-  'electric_motor': {
-    type: 'item',
-    recipe: true,
-    width: 1,
-    height: 1
-  },
-  'concrete': {
-    type: 'item',
-    width: 1,
-    height: 1,
-  },
-  'se_electric_boiler': {
-    type: "item",
-    width: 3,
-    height: 2
-  },
-  "se_heat_shielding": {
-    type: "item",
-    height: 1,
-    width: 1
-  },
-  "se_meteor_defence_ammo": {
-    type: "item",
-    height: 1,
-    width: 1
-  },
-  "stone_tablet": {
-    type: "item",
-    height: 1,
-    widht: 1
-  },
-  "small_iron_electric_pole": {
-    type: "item",
-    height: 1,
-    widht: 1
-  },
-  "motor": {
-    type: "item",
-    height: 1,
-    widht: 1
-  }
-});
+Blueprint.setEntityData(seBlueprintData);
 
 function humanize(string) {
   let spaces = string.replaceAll('_', ' ');
@@ -298,7 +215,7 @@ function createSorter(assemblers) {
   bp.name = "Main Sorter";
 
   let storedItems = getAllIngredients(assemblers);
-  storedItems = storedItems;
+  //storedItems = storedItems;
 
   let startY = 1;
   let segment = 1;
