@@ -31,7 +31,7 @@ export const useAppStore = defineStore('app', {
       recipes: namedRecipes,
       icons: namedIcons,
       categories: namedCategories,
-      selectedRecipes: [],
+      selectedRecipes: ['stack-inserter'],
       producers: [{
         "id": "burner-assembling-machine",
         "name": "Burner assembling machine",
