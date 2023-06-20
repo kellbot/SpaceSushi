@@ -1,7 +1,7 @@
 <template>
 	<v-container>
 		<v-responsive class="align-center text-center">
-
+	
 			<v-card>
 
 				<v-tabs v-model="tab" bg-color="secondary">
@@ -11,7 +11,7 @@
 
 				<v-item-group mandatory multiple selected-class="item-selected" v-model="selectedRecipes">
 					<v-window v-model="tab">
-						<v-window-item v-for="category in categories" :value="category.id">
+						<v-window-item v-for="category in categories" :value="category.id" eager>
 							<template v-for="recipeId in category.items">
 							<v-item  v-if="(recipes[recipeId])"
 								:value="recipeId" v-slot="{ isSelected, selectedClass, toggle }">

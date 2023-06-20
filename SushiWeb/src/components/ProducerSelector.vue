@@ -12,15 +12,18 @@
                 </v-expansion-panel-text>
             </v-expansion-panel>
         </v-expansion-panels>
+        
+        <KeepAlive>
+
         <v-expansion-panels>
             <v-expansion-panel :value="0">
                 <v-expansion-panel-title color="primary">Recipe Selector</v-expansion-panel-title>
-                <v-expansion-panel-text>
+                <v-expansion-panel-text eager>
                     <ItemPicker :selectedProducers="selected" />
                 </v-expansion-panel-text>
             </v-expansion-panel>
         </v-expansion-panels>
-
+    </KeepAlive>
 
     </v-container>
 </template>

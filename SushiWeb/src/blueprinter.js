@@ -463,7 +463,7 @@ function createSorter(assemblers) {
 }
 
 function recursiveAssemblers(assemblerList) {
-  let problems = ['water', 'heavy-oil', 'steam', 'crude-oil', 'sulfuric-acid','petroleum-gas', 'copper-ore', 'stone', 
+  let problems = ['sulfur', 'water', 'heavy-oil', 'steam', 'crude-oil', 'sulfuric-acid','petroleum-gas', 'copper-ore', 'stone', 
 'coal', 'iron-ore'];
   assemblerList = assemblerList.filter(i => {
     //remove problem children
