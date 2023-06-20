@@ -1,7 +1,7 @@
 <template>
 
       <v-btn :data-recipe-id="item.id" 
-      :class="['itemImage float-left']" :style="{ backgroundPosition: icon.scaledPosition}">
+      :class="['itemImage float-left']" :style="{ backgroundPosition:  iconPos(icon)}">
         <v-tooltip
         activator="parent"
         location="start"
