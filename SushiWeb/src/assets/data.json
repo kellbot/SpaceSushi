@@ -20337,9 +20337,6 @@
                 "se-molten-iron": 900
             },
             "producers": [
-                "stone-furnace",
-                "steel-furnace",
-                "electric-furnace",
                 "industrial-furnace",
                 "se-space-thermodynamics-laboratory"
             ],
@@ -20627,9 +20624,6 @@
                 "se-molten-copper": 900
             },
             "producers": [
-                "stone-furnace",
-                "steel-furnace",
-                "electric-furnace",
                 "industrial-furnace",
                 "se-space-thermodynamics-laboratory"
             ],
@@ -21628,9 +21622,6 @@
                 "se-molten-beryllium": 250
             },
             "producers": [
-                "stone-furnace",
-                "steel-furnace",
-                "electric-furnace",
                 "industrial-furnace",
                 "se-space-thermodynamics-laboratory"
             ],
@@ -21911,9 +21902,6 @@
                 "se-molten-holmium": 250
             },
             "producers": [
-                "stone-furnace",
-                "steel-furnace",
-                "electric-furnace",
                 "industrial-furnace",
                 "se-space-thermodynamics-laboratory"
             ],

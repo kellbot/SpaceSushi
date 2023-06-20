@@ -1,31 +1,15 @@
 <template>
 	<v-container>
-		<v-responsive class="align-center text-center">
 
-			<v-card>
-				<v-toolbar title="Item Picker" color="primary">
-					<v-btn icon @click="showAll = !showAll">
-						<v-icon>mdi-eye-off-outline </v-icon>
-						<v-tooltip activator="parent" location="start">Hide Unselected</v-tooltip>
-					</v-btn>
 					<template v-slot:extension>
 						<v-tabs v-model="tab" bg-color="primary">
-							<!-- <v-tab value="all">All</v-tab> -->
 							<v-tab v-for="(category, index) in categories" :value="category.id">{{ category.name }}</v-tab>
-
 						</v-tabs>
 					</template>
-				</v-toolbar>
-				<v-card-text>
-					<v-item-group mandatory multiple selected-class="item-selected" v-model="activeRecipes">
+		
+				
+					<v-item-group mandatory multiple selected-class="item-selected" v-model="appStore.selectedRecipes">
 						<v-window v-model="tab">
-							<!-- <v-window-item value="all">
-							<v-item v-for="recipe in filteredRecipes({producers: selectedProducers})" :value="recipe.id"
-									v-slot="{ isSelected, selectedClass, toggle }">
-									<ItemButton :style="{ display: isSelected || showAll ? 'block' : 'none !important' }" :item="recipe"
-										:icon="findIcon(recipe)" @click="toggle" :class="['d-flex align-center', selectedClass]" />
-								</v-item>
-						</v-window-item> -->
 							<v-window-item v-for="(category, index) in categories" :value="category.id">
 
 								<v-item v-for="recipe in filteredRecipes({ categories: [category.id], producers: selectedProducers })"
@@ -37,14 +21,6 @@
 							</v-window-item>
 						</v-window>
 					</v-item-group>
-				</v-card-text>
-			</v-card>
-
-			<v-card>
-				{{ activeRecipes }}
-			</v-card>
-
-		</v-responsive>
 	</v-container>
 </template>
 <style>
@@ -65,9 +41,10 @@
 }
 </style>
 <script>
+import { resolveComponent } from 'vue';
+
 import ItemButton from '@/components/itemButton.vue';
 import itemData from '@/assets/data.json';
-import { resolveComponent } from 'vue';
 
 // Pre-cleaning of the data
 // Scale the icons
@@ -103,6 +80,9 @@ function findIcon(item) {
 		return obj.id === item.id;
 	})[0];
 }
+import { useAppStore } from '@/store/app';
+
+let appStore = useAppStore();
 
 export default {
 	data: () => ({
@@ -113,17 +93,12 @@ export default {
 		recipes: recipes,
 		categories: itemData.categories,
 		showAll: true,
-		activeRecipes: [],
-		getSelected: () => {
-			let selectedItems = [];
-			return selectedItems;
-		},
+		appStore: appStore,
 	}),
 
 	methods: {
 		// return some subset of items. no categories or producers will show items from all 
 		filteredRecipes({ showAll = true, categories = [], producers = [] }) {
-
 			let recipes = this.recipes;
 			if (producers.length > 0) {
 				recipes = recipes.filter(r => {
