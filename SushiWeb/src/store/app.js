@@ -1,15 +1,37 @@
 // Utilities
 import { defineStore } from 'pinia'
 
-import { items, recipes, categories } from '@/assets/data.json' 
+import { items, recipes, categories, icons } from '@/assets/data.json' 
+
+let namedCategories = {}
+categories.forEach(c => {
+  namedCategories[c.id] = c;
+  namedCategories[c.id].items = [];
+});
+
+let namedRecipes = {};
+recipes.forEach(r => {
+  namedRecipes[r.id] = r;
+});
+let namedIcons = {};
+icons.forEach(i => {
+  namedIcons[i.id] = i;
+})
+let namedItems = {};
+items.forEach(i => {
+  namedItems[i.id] = i;
+  
+  namedCategories[i.category].items.push(i.id);
+});
 
 export const useAppStore = defineStore('app', {
   state: () => {
     return {
-      items: items,
-      recipes: recipes,
-      categories: categories,
-      selectedRecipes: ['accumulator'],
+      items: namedItems,
+      recipes: namedRecipes,
+      icons: namedIcons,
+      categories: namedCategories,
+      selectedRecipes: [],
       producers: [{
         "id": "burner-assembling-machine",
         "name": "Burner assembling machine",

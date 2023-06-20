@@ -11,14 +11,17 @@
                     </v-sheet>
                 </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel>
-                <v-expansion-panel-title color="primary">Enabled Recipes</v-expansion-panel-title>
+        </v-expansion-panels>
+        <v-expansion-panels>
+            <v-expansion-panel :value="0">
+                <v-expansion-panel-title color="primary">Recipe Selector</v-expansion-panel-title>
                 <v-expansion-panel-text>
                     <ItemPicker :selectedProducers="selected" />
                 </v-expansion-panel-text>
             </v-expansion-panel>
-
         </v-expansion-panels>
+
+
     </v-container>
 </template>
 <script>

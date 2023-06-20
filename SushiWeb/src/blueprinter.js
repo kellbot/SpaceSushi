@@ -136,9 +136,17 @@ function getAllIngredients(itemNameArray) {
 
 }
 
+function checkEntity(itemName) {
+  if(!Blueprint.getEntityData()[itemName.replaceAll('-','_')]){
+    let data = new Object();
+    data[itemName.replaceAll('-','_')] = i1x1;
+    Blueprint.setEntityData(data);
+  } 
+}
 
 // creates the storage boxes and assembler for an item, optionally creates a return to the main belt
 function createProducerBlueprint(itemName, beltReturn = false) {
+  checkEntity(itemName);
   let currentItem = getSeItem(itemName);
   let obSet = getIngredients(itemName);
   let recipe = getRecipes(itemName)[0];
@@ -147,7 +155,7 @@ function createProducerBlueprint(itemName, beltReturn = false) {
   ob.icons = [itemName.replaceAll('-','_')];
 
   let combinator = ob.createEntity("constant_combinator", { x: 1, y: -6 });
-
+  if (recipe.category == 'fluids') return false;
 
   let machine, pipePos;
   if (recipe.producers.includes('assembling-machine-2')) {
@@ -163,6 +171,8 @@ function createProducerBlueprint(itemName, beltReturn = false) {
   } else if (recipe.producers.includes('electric-furnace')) {
     machine = ob.createEntity('electric_furnace', { x: 0, y: -4 });
     ob.icons.push('electric_furnace');
+  } else {
+    return false;
   }
 
   let lastChest;
@@ -372,7 +382,9 @@ function createSorter(assemblers) {
 
         if (boxNo < storedItems.length) {
           itemName = storedItems[boxNo];
-          sfb.setFilter(0, itemName);
+          checkEntity(itemName);
+            sfb.setFilter(0, itemName);
+
           bottomBox.setRequestFilter(0, itemName);
           sb.setCondition({
             left: itemName,
@@ -381,11 +393,13 @@ function createSorter(assemblers) {
           });
         }
         boxNo++;
-
+  
         itemName = storedItems[boxNo];
+       
         let sft = bp.createEntity('stack_filter_inserter', { x: sftx, y: startY - 2 }, Blueprint.UP);
         let st = bp.createEntity('stack_inserter', { x: stx, y: startY - 2 }, Blueprint.DOWN);
         if (boxNo < storedItems.length) {
+          checkEntity(itemName);
           sft.setFilter(0, itemName);
           
           topBox.setRequestFilter(0, itemName);
@@ -448,20 +462,44 @@ function createSorter(assemblers) {
 
 }
 
+function recursiveAssemblers(assemblerList) {
+  let problems = ['water', 'heavy-oil', 'steam', 'crude-oil', 'sulfuric-acid','petroleum-gas', 'copper-ore', 'stone', 
+'coal', 'iron-ore'];
+  assemblerList = assemblerList.filter(i => {
+    //remove problem children
+    return  !(problems.includes(i));
+  });
+  let storedItems = getAllIngredients(assemblerList).filter(i => {
+    //remove problem children
+    return  !(problems.includes(i));
+  }
+    );
+  let allAssemblers = Array.from(new Set(assemblerList.concat(storedItems)));
+  if (allAssemblers.length > assemblerList.length) {
+    allAssemblers = recursiveAssemblers(allAssemblers);
+  } else {
+    return allAssemblers;
+  }
+  return allAssemblers;
+}
 
 function createBook(assemblers) {
-  let storedItems = getAllIngredients(assemblers);
   let obPrints = [];
-  obPrints.push(createSorter(assemblers));
+  let allAssemblers =  recursiveAssemblers(assemblers);
+  console.log(`All: ${ recursiveAssemblers(assemblers)}`);
+  
+  let storedItems = getAllIngredients(allAssemblers);
+
+  obPrints.push(createSorter(allAssemblers));
   obPrints.push(createImportRow(storedItems));
   //make assemblers 
-  for (let i = 0; i < assemblers.length; i++) {
-    let objOutput = storedItems.includes(assemblers[i]) ? true : false;
+  for (let i = 0; i < allAssemblers.length; i++) {
+    let objOutput = storedItems.includes(allAssemblers[i]) ? true : false;
     try {
-      obPrints.push(createProducerBlueprint(assemblers[i], objOutput));
+      obPrints.push(createProducerBlueprint(allAssemblers[i], objOutput));
     } catch (e) {
       console.log(e);
-      console.log(`Building ${assemblers[i]}`);
+      console.log(`Problem buliding ${allAssemblers[i]}`);
     }
   }
 
