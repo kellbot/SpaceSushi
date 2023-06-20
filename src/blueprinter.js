@@ -449,7 +449,7 @@ export function getIntermediateProducts(primaryProducers, producerTypes = [], re
   
     if (recursive && intermediates.length > 0) {
   
-      let tertiary = getIntermediateProducts( intermediates.map(i=> (i.id)), producerTypes, false);
+      let tertiary = getIntermediateProducts( intermediates.map(i=> (i.id)), producerTypes, true);
       intermediates = Array.from(new Set(intermediates.concat(tertiary)));
     }
   return intermediates;
