@@ -46,9 +46,7 @@
 }
 </style>
 <script>
-import { resolveComponent } from 'vue';
-
-import ItemButton from '@/components/itemButton.vue';
+import ItemButton from '@/components/ItemButton.vue';
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia'
 
