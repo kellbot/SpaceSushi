@@ -154,9 +154,7 @@ function createProducerBlueprint(itemName, beltReturn = false) {
 
       //add a pipe to ground for fluids
     } else if (activeItem.category == "fluids") {
-      console.log(activeItem);
       fluidCount++;
-      console.log(fluidCount);
       // We don't support multiple fluids
       if (fluidCount > 1) return false;
       ob.createEntity("pipe_to_ground", { x: pipePos, y: -5 }, Blueprint.DOWN);

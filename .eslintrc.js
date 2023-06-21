@@ -9,6 +9,7 @@ module.exports = {
   ],
   rules: {
     "vue/valid-v-for": "off",
-    "vue/require-default-prop": "off"
+    "vue/require-default-prop": "off",
+    "vue/multi-word-component-names": "off"
   }
 }

@@ -1,6 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<!-- eslint-disable vue/valid-v-for -->
-<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <BlueprintHeader />
   <ProducerSelector />
@@ -56,8 +53,8 @@
     </v-card>
   </v-container>
 </template>
-
-<script>
+  <script>
+  
 
 import ProducerSelector from '@/components/ProducerSelector.vue';
 import ItemButton from '@/components/ItemButton.vue';
