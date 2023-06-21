@@ -1,17 +1,6 @@
 # essentials
 
-## Project setup
-
-```
-# yarn
-yarn
-
-# npm
-npm install
-
-# pnpm
-pnpm install
-```
+Sushi belt generator. Doesn't play well with fluids.
 
 ### Compiles and hot-reloads for development
 

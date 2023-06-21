@@ -25,6 +25,8 @@ items.forEach(i => {
 
 export const useAppStore = defineStore('app', {
   state: () => {
+    if (localStorage.getItem("app"))
+      return JSON.parse(localStorage.getItem("app"));
     return {
       items: namedItems,
       recipes: namedRecipes,

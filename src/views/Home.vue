@@ -2,6 +2,7 @@
 <!-- eslint-disable vue/valid-v-for -->
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
+  <BlueprintHeader />
   <ProducerSelector />
 
   <v-container>
@@ -43,6 +44,7 @@
 
 import ProducerSelector from '@/components/ProducerSelector.vue';
 import ItemButton from '@/components/ItemButton.vue';
+import BlueprintHeader from '@/components/BlueprintHeader.vue';
 import { getBlueprintString, getIntermediateProducts } from '@/blueprinter.js';
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia'
@@ -79,7 +81,8 @@ export default {
   },
   components: {
     ProducerSelector,
-    ItemButton
+    ItemButton,
+    BlueprintHeader
   }
 }
 </script>
