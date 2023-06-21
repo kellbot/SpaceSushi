@@ -9,32 +9,49 @@
     <v-card>
       <v-card-title>Selected Recipes</v-card-title>
       <v-card-text>
-        <v-row align="center" class="mx-0">
-          <ItemButton v-for="recipeId in selectedRecipes" :item="recipes[recipeId]" :icon="icons[recipeId]"
-            :class="['d-flex align-center item-selected']" />
+        <v-row
+          align="center"
+          class="mx-0"
+        >
+          <ItemButton
+            v-for="recipeId in selectedRecipes"
+            :item="recipes[recipeId]"
+            :icon="icons[recipeId]"
+            :class="['d-flex align-center item-selected']"
+          />
         </v-row>
       </v-card-text>
       <v-card-title>
         Intermediate Products
       </v-card-title>
       <v-card-text class="m0 p0">
-      <v-row align="center" class="mx-0">
-        <ItemButton v-for="itemId in intermedateRecipes()" :item="items[itemId]" :icon="icons[itemId]"
-          :class="['d-flex align-center item-selected']" />
-      </v-row>
+        <v-row
+          align="center"
+          class="mx-0"
+        >
+          <ItemButton
+            v-for="itemId in intermedateRecipes()"
+            :item="items[itemId]"
+            :icon="icons[itemId]"
+            :class="['d-flex align-center item-selected']"
+          />
+        </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="generate(selectedRecipes)">Generate</v-btn>
+        <v-btn @click="generate(selectedRecipes)">
+          Generate
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
 
   <v-container>
-
-    <v-card variant="outlined"><v-card-text>
-        <v-btn @click="copyCode">Copy</v-btn>
+    <v-card variant="outlined">
+      <v-card-text>
+        <v-btn @click="copyCode">
+          Copy
+        </v-btn>
         {{ blueprintString }}
-
       </v-card-text>
     </v-card>
   </v-container>
