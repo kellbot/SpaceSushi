@@ -1,6 +1,15 @@
 <template>
-  <v-btn :data-recipe-id="item.id" :class="['itemImage float-left']" :style="{ backgroundPosition: iconPos(icon) }">
-    <v-tooltip activator="parent" location="start">{{ item.name }}</v-tooltip>
+  <v-btn
+    :data-recipe-id="item.id"
+    :class="['itemImage float-left']"
+    :style="{ backgroundPosition: iconPos(icon) }"
+  >
+    <v-tooltip
+      activator="parent"
+      location="start"
+    >
+      {{ item.name }}
+    </v-tooltip>
   </v-btn>
 </template>
 <script>
