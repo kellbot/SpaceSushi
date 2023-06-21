@@ -17,13 +17,34 @@ function humanize(string) {
 }
 
 function getSeItem(name) {
-  return seData.items.filter(i => {
+  let item = seData.items.filter(i => {
     return i.id == name;
   })[0];
+
+  try {
+    if (!item) item = getItemFromRecipe(name);
+  } catch (e) {
+    console.log(e);
+    console.log(`Cannot find ${name}`);
+  }
+  return item;
+
+}
+
+function getItemFromRecipe(id) {
+
+  let recipe = seData.recipes.filter(r => {
+
+    return r.id == id;
+
+  })[0];
+  let item = recipe.out[0];
+
+  return item;
 }
 
 function getRecipes(name) {
-  if(name == 'electronic-circuit-stone') name = 'electronic-circuit';
+  if (name == 'electronic-circuit-stone') name = 'electronic-circuit';
   try {
     return seData.recipes.filter(r => {
       return r.out[name]
@@ -34,6 +55,7 @@ function getRecipes(name) {
   }
 }
 
+// returns the inputs for the first recipe that outputs this item
 function getIngredients(itemName) {
   let recipe = getRecipes(itemName)[0];
   if (!recipe) return false;
@@ -56,11 +78,11 @@ function getAllIngredients(itemNameArray) {
 }
 
 function checkEntity(itemName) {
-  if(!Blueprint.getEntityData()[itemName.replaceAll('-','_')]){
+  if (!Blueprint.getEntityData()[itemName.replaceAll('-', '_')]) {
     let data = new Object();
-    data[itemName.replaceAll('-','_')] = i1x1;
+    data[itemName.replaceAll('-', '_')] = i1x1;
     Blueprint.setEntityData(data);
-  } 
+  }
 }
 
 // creates the storage boxes and assembler for an item, optionally creates a return to the main belt
@@ -69,9 +91,10 @@ function createProducerBlueprint(itemName, beltReturn = false) {
   let currentItem = getSeItem(itemName);
   let obSet = getIngredients(itemName);
   let recipe = getRecipes(itemName)[0];
+  let fluidCount = 0;
   const ob = new Blueprint();
   ob.name = `${humanize(itemName)} Producer`;
-  ob.icons = [itemName.replaceAll('-','_')];
+  ob.icons = [itemName.replaceAll('-', '_')];
 
   let combinator = ob.createEntity("constant_combinator", { x: 1, y: -6 });
   if (recipe.category == 'fluids') return false;
@@ -131,8 +154,13 @@ function createProducerBlueprint(itemName, beltReturn = false) {
 
       //add a pipe to ground for fluids
     } else if (activeItem.category == "fluids") {
-      ob.createEntity("pipe_to_ground", {x: pipePos, y: -5}, Blueprint.DOWN);
-      ob.createEntity("pipe_to_ground", {x: pipePos, y: -7}, Blueprint.UP);
+      console.log(activeItem);
+      fluidCount++;
+      console.log(fluidCount);
+      // We don't support multiple fluids
+      if (fluidCount > 1) return false;
+      ob.createEntity("pipe_to_ground", { x: pipePos, y: -5 }, Blueprint.DOWN);
+      ob.createEntity("pipe_to_ground", { x: pipePos, y: -7 }, Blueprint.UP);
 
     }
   }
@@ -189,8 +217,10 @@ function createImportRow(inputItems) {
   let lastInserter;
   for (let i = 0; i < inputItems.length; i++) {
     let name = inputItems[i];
+    checkEntity(name);
     if (name == 'electronic-circuit-stone') name = 'electronic-circuit';
     let seItem = getSeItem(name);
+    if (!seItem) continue;
     if (seItem.category == 'fluids') continue;
 
     let stackSize = seItem.stack;
@@ -224,7 +254,7 @@ function createPoleRing() {
     let poleRow = [];
     let oldPole;
     for (let i = 0; i < 5; i++) {
-      let pole = pr.createEntity('medium_electric_pole', {x: i*3, y: row});
+      let pole = pr.createEntity('medium_electric_pole', { x: i * 3, y: row });
       if (oldPole) {
         pole.connect(oldPole, null, null, "red");
         pole.connect(oldPole, null, null, "green");
@@ -234,29 +264,29 @@ function createPoleRing() {
     }
     poles.push(poleRow);
   }
-    // substations for reference
-  let ref1 = pr.createEntity("substation", {x: -2, y: 2});
-  let ref2 = pr.createEntity("substation", {x: 16, y: 2});
-      // substations for connection
-  pr.createEntity("substation", {x: -2, y: -10})
+  // substations for reference
+  let ref1 = pr.createEntity("substation", { x: -2, y: 2 });
+  let ref2 = pr.createEntity("substation", { x: 16, y: 2 });
+  // substations for connection
+  pr.createEntity("substation", { x: -2, y: -10 })
     .connect(ref1, null, null, "red")
     .connect(ref1, null, null, "green")
     .connect(poles[0][0]);
 
-      pr.createEntity("substation", {x: -2, y: 14}).connect(ref1, null, null, "red")
-      .connect(ref1, null, null, "green")
-      .connect(poles[1][0]);
+  pr.createEntity("substation", { x: -2, y: 14 }).connect(ref1, null, null, "red")
+    .connect(ref1, null, null, "green")
+    .connect(poles[1][0]);
 
 
-      pr.createEntity("substation", {x: 16, y: -10}).connect(ref2, null, null, "red")
-      .connect(ref2, null, null, "green")
-      .connect(poles[0].slice(-1)[0], null, null, "red")
-      .connect(poles[0].slice(-1)[0], null, null, "green");
+  pr.createEntity("substation", { x: 16, y: -10 }).connect(ref2, null, null, "red")
+    .connect(ref2, null, null, "green")
+    .connect(poles[0].slice(-1)[0], null, null, "red")
+    .connect(poles[0].slice(-1)[0], null, null, "green");
 
-      pr.createEntity("substation", {x: 16, y: 14}).connect(ref2, null, null, "red")
-      .connect(ref2, null, null, "green")
-      .connect(poles[1].slice(-1)[0], null, null, "red")
-      .connect(poles[1].slice(-1)[0], null, null, "green");;
+  pr.createEntity("substation", { x: 16, y: 14 }).connect(ref2, null, null, "red")
+    .connect(ref2, null, null, "green")
+    .connect(poles[1].slice(-1)[0], null, null, "red")
+    .connect(poles[1].slice(-1)[0], null, null, "green");
 
 
   return pr;
@@ -270,10 +300,8 @@ function createSorter(assemblers) {
   let storedItems = getAllIngredients(assemblers);
   storedItems = storedItems.filter(s => {
     let i = getSeItem(s);
-    console.log(i);
     return !(i.category == 'fluids');
   });
-  console.log(storedItems);
 
   let startY = 1;
   let segment = 1;
@@ -358,7 +386,7 @@ function createSorter(assemblers) {
         if (boxNo < storedItems.length) {
           itemName = storedItems[boxNo];
           checkEntity(itemName);
-            sfb.setFilter(0, itemName);
+          sfb.setFilter(0, itemName);
 
           bottomBox.setRequestFilter(0, itemName);
           sb.setCondition({
@@ -368,15 +396,15 @@ function createSorter(assemblers) {
           });
         }
         boxNo++;
-  
+
         itemName = storedItems[boxNo];
-       
+
         let sft = bp.createEntity('stack_filter_inserter', { x: sftx, y: startY - 2 }, Blueprint.UP);
         let st = bp.createEntity('stack_inserter', { x: stx, y: startY - 2 }, Blueprint.DOWN);
         if (boxNo < storedItems.length) {
           checkEntity(itemName);
           sft.setFilter(0, itemName);
-          
+
           topBox.setRequestFilter(0, itemName);
           st.setCondition({
             left: itemName,
@@ -438,27 +466,31 @@ function createSorter(assemblers) {
 }
 
 // get intermediate products, optionally filtered by a list of producers
-export function getIntermediateProducts(primaryProducers, producerTypes = [], recursive = false) {
-  let ingredients = getAllIngredients(primaryProducers);
+export function getIntermediateProducts(itemList, producerTypes = [], recursive = false) {
+  //these should be items
+  let intermediates = getAllIngredients(itemList);
 
-  //find ingrediets for all primary producers
-  let intermediates = ingredients.map(i => ( getRecipes(i)[0] ) );
-  //filter out items not produced in these types
+  //filter out items not produced in these types, and fluids because they're a pain
   if (producerTypes.length > 0)
-    intermediates = intermediates.filter(m => (producerTypes.some(e => (m.producers.includes(e)))))
-  
-    if (recursive && intermediates.length > 0) {
-  
-      let tertiary = getIntermediateProducts( intermediates.map(i=> (i.id)), producerTypes, true);
-      intermediates = Array.from(new Set(intermediates.concat(tertiary)));
-    }
-  return intermediates;
+    intermediates = intermediates.filter(m => {
+      let mItem = getSeItem(m);
+      let mRecipe = getRecipes(m)[0];
+      return (producerTypes.some(e => (mRecipe.producers.includes(e))) && mItem.category != 'fluids');
+    });
+
+  if (recursive && intermediates.length > 0) {
+
+    let tertiary = getIntermediateProducts(intermediates, producerTypes, true);
+
+    intermediates = Array.from(new Set(intermediates.concat(tertiary)));
   }
+  return intermediates;
+}
 
 
 function createBook(assemblers) {
   let obPrints = [];
-  
+
   let storedItems = getAllIngredients(assemblers);
 
   obPrints.push(createSorter(assemblers));
@@ -480,7 +512,7 @@ function createBook(assemblers) {
 
 export function getBlueprintString(assemblerList) {
   return Blueprint.toBook(createBook(assemblerList));
-  }
+}
 
-export default { getBlueprintString, getIntermediateProducts};
+export default { getBlueprintString, getIntermediateProducts };
 

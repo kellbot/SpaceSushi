@@ -1,3 +1,6 @@
+<!-- eslint-disable vue/multi-word-component-names -->
+<!-- eslint-disable vue/valid-v-for -->
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <ProducerSelector />
 
@@ -7,24 +10,24 @@
       <v-card-text>
         <v-row align="center" class="mx-0">
           <ItemButton v-for="recipeId in selectedRecipes" :item="recipes[recipeId]" :icon="icons[recipeId]"
-            :class="['d-flex align-center']" />
+            :class="['d-flex align-center item-selected']" />
         </v-row>
       </v-card-text>
-      <v-divider class="mx-4 mb-1"></v-divider>
       <v-card-title>
         Intermediate Products
       </v-card-title>
-      <v-card-text>
+      <v-card-text class="m0 p0">
       <v-row align="center" class="mx-0">
-        <ItemButton v-for="recipeId in intermedateRecipes()" :item="recipes[recipeId]" :icon="icons[recipeId]"
-          :class="['d-flex align-center']" />
+        <ItemButton v-for="itemId in intermedateRecipes()" :item="items[itemId]" :icon="icons[itemId]"
+          :class="['d-flex align-center item-selected']" />
       </v-row>
       </v-card-text>
+      <v-card-actions>
+        <v-btn @click="generate(selectedRecipes)">Generate</v-btn>
+      </v-card-actions>
     </v-card>
   </v-container>
-  <v-container>
-    <v-btn @click="generate(selectedRecipes)">Generate</v-btn>
-  </v-container>
+
   <v-container>
 
     <v-card variant="outlined"><v-card-text>
@@ -37,7 +40,7 @@
 </template>
 
 <script>
-import ItemPicker from '@/components/ItemPicker.vue';
+
 import ProducerSelector from '@/components/ProducerSelector.vue';
 import ItemButton from '@/components/ItemButton.vue';
 import { getBlueprintString, getIntermediateProducts } from '@/blueprinter.js';
@@ -52,6 +55,7 @@ const { selectedRecipes } = storeToRefs(appStore);
 export default {
   data: () => ({
     selectedRecipes: selectedRecipes,
+    items: appStore.items,
     recipes: appStore.recipes,
     icons: appStore.icons,
     blueprintString: ''
@@ -60,7 +64,7 @@ export default {
     intermedateRecipes() {
       return getIntermediateProducts(this.selectedRecipes,
        ['assembling-machine-1', 'assembling-machine-2', 'assembling-machine-3', 'electric-furnace', 'chemical-plant'],
-       true).map(i=> (i.id));
+       true);
     },
     createBlueprintString() {
       return getBlueprintString(Array.from(new Set(this.selectedRecipes.concat(this.intermedateRecipes(this.selectedRecipes)))))

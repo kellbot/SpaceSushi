@@ -1,10 +1,11 @@
+<!-- eslint-disable vue/valid-v-for -->
 <template>
-	<v-container>
-		<v-responsive class="align-center text-center">
-	
+
+		<!-- <v-responsive class="align-center text-center">
+	 -->
 			<v-card>
 
-				<v-tabs v-model="tab" bg-color="secondary">
+				<v-tabs v-model="tab" bg-color="primary" show-arrows>
 					<v-tab v-for="category in categories" :value="category.id">{{ category.name }}</v-tab>
 				</v-tabs>
 
@@ -12,10 +13,10 @@
 				<v-item-group mandatory multiple selected-class="item-selected" v-model="selectedRecipes">
 					<v-window v-model="tab">
 						<v-window-item v-for="category in categories" :value="category.id" eager>
-							<template v-for="recipeId in category.items">
-							<v-item  v-if="(recipes[recipeId])"
-								:value="recipeId" v-slot="{ isSelected, selectedClass, toggle }">
-								<ItemButton :item="recipes[recipeId]" :icon="icons[recipeId]" @click="toggle"
+							<template v-for="itemId in category.items">
+							<v-item  v-if="(items[itemId])"
+								:value="itemId" v-slot="{ selectedClass, toggle }">
+								<ItemButton :item="items[itemId]" :icon="icons[itemId]" @click="toggle"
 									:class="['d-flex align-center', selectedClass]" />
 							</v-item>
 						</template>
@@ -25,8 +26,8 @@
 				</v-item-group>
 
 			</v-card>
-		</v-responsive>
-	</v-container>
+		<!-- </v-responsive> -->
+
 </template>
 <style>
 .itemImage {
@@ -42,6 +43,9 @@
 
 .item-selected {
 	opacity: 1;
+}
+.v-item-group .item-selected {
+	
 	background-color: rgb(var(--v-theme-primary));
 }
 </style>
@@ -59,6 +63,7 @@ export default {
 		tab: null,
 
 		//scale icons
+		items: appStore.items,
 		icons: appStore.icons,
 		recipes: appStore.recipes,
 		categories: appStore.categories,

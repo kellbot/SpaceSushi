@@ -20,7 +20,6 @@ icons.forEach(i => {
 let namedItems = {};
 items.forEach(i => {
   namedItems[i.id] = i;
-  
   namedCategories[i.category].items.push(i.id);
 });
 
