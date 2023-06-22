@@ -33,9 +33,10 @@ export default class RailBook {
         let cornerRail = new RailSection(this);
         cornerRail.name = "Curved Track";
         cornerRail.createCurvedRail();
+        
+        cornerRail.addRailConnections({left: true, bottom: true});
         cornerRail.setSnapping();
         cornerRail.wirePoles();
-        cornerRail.addRailConnections({left: true, bottom: true});
         this.cornerRail = cornerRail;
         return cornerRail;
     }
@@ -47,6 +48,28 @@ export default class RailBook {
         tRail.createCurvedRail({allowOverlap: true});
         tRail.createCurvedRail({allowOverlap: true, rotate: true});
         tRail.addRailConnections({left: true, bottom: true, right: true});
+        //Signal direction points to rail
+        let signalPositions = [
+            // top and bottom middle
+           {pos: {x: this.gridSize/2 - 1, y: tRail.topY - 1 }, dir: Blueprint.RIGHT },
+           {pos: {x: this.gridSize/2 - 1, y: tRail.bottomY + 2 }, dir: Blueprint.LEFT },
+           // bottom 1/4 and 3/4
+           {pos: {x: this.gridSize/4 - 1 , y: tRail.bottomY + 2 }, dir: Blueprint.LEFT }, 
+           {pos: {x: this.gridSize/4 * 3, y: tRail.bottomY + 2 }, dir: Blueprint.LEFT }, 
+           // above / below right curve
+           {pos: {x: this.gridSize/4 * 3, y: tRail.topY + 3 }, dir: Blueprint.RIGHT - 1 },
+           {pos: {x: this.gridSize/4 * 3, y: tRail.bottomY + 9 }, dir: Blueprint.LEFT + 1 }, 
+           // above / below left curve
+           {pos: {x: this.gridSize/4 - 1, y: tRail.topY + 3 }, dir: Blueprint.RIGHT + 1 },  
+           {pos: {x: this.gridSize/4 - 1, y: tRail.bottomY + 9 }, dir: Blueprint.LEFT + 1 }, 
+           // inside triangle curves
+           {pos: {x: this.gridSize/2 - 4, y: tRail.bottomY + 4 }, dir: Blueprint.RIGHT + 1 },
+           {pos: {x: this.gridSize/2 + 3, y: tRail.bottomY + 4 }, dir: Blueprint.RIGHT - 1 },
+        ];
+        console.log(this);
+        signalPositions.forEach(s => {
+            tRail.createEntity('rail-chain-signal', s.pos, s.dir, true);
+        });
         tRail.setSnapping();
         return tRail;
 
@@ -54,6 +77,7 @@ export default class RailBook {
 
 
     generate() {
+        
         return Blueprint.toBook(this.blueprints);
     }
 }
@@ -70,6 +94,11 @@ class RailSection extends Blueprint {
         this.rightX = parent.gridSize / 2 + parent.trackSpacing/2;
        this.signals = []; // array of signals entities, for easier manipulation later
        this.poles = []; //Poles, which likely need to be connected
+
+       console.log("Rotation test");
+       let test =  { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize/2 - 2 }, dir: Blueprint.UP };
+       console.log(test.pos);
+       console.log(RailSection.rotateCoordinate(test.pos, this.gridSize));
     }
 
     static flip(num) {
@@ -82,7 +111,7 @@ class RailSection extends Blueprint {
     static rotateCoordinate(pos, size) {
         let newPos = {};
         newPos.x = size/2 + pos.y; // Calculate the new X coordinate
-        newPos.y = size/2 - pos.x + 2; // Calculate the new Y coordinate
+        newPos.y = size/2 - pos.x; // Calculate the new Y coordinate
         return newPos;
         
     }
@@ -102,12 +131,13 @@ class RailSection extends Blueprint {
     createCurvedRail({allowOverlap = false, rotate = false} = {}) {
         let rails = [    
                { ent: 'straight-rail', pos: { x: 2, y: this.topY }, dir: Blueprint.RIGHT },
-         //      { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize/2 -2 }, dir: Blueprint.UP },
+               { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize/2 - 2 }, dir: Blueprint.UP },
                { ent: 'curved-rail', pos:  { x: 8, y: this.topY + 2 }, dir: 3 },
                { ent: 'curved-rail', pos:  { x: 6, y: this.bottomY + 2 }, dir: 3 },
                { ent: 'curved-rail', pos:  { x: 8 + 2*this.trackSpacing, y: this.bottomY + 16 }, dir: 0 },
                { ent: 'curved-rail', pos:  { x: 16 + 2*this.trackSpacing, y: this.gridSize/2 - 6 }, dir: 0 },
             ];
+
 
         let runs = [
             {from: { x: 10, y: this.topY + 4 }, to: { x: 12 + 2*this.trackSpacing, y: this.topY + 18 }},
@@ -203,9 +233,7 @@ class RailSection extends Blueprint {
         })
     }
     runRail(from = { x: 0, y: 0 }, to = { x: this.gridSize, y: 0 }) {
-        console.log("running");
-        console.log(from);
-        console.log(to);
+
         let direction;
         if (from == to) return false
         // Determine direction
