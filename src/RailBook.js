@@ -108,10 +108,21 @@ class RailSection extends Blueprint {
         if (num == 5) return 1;
 
     }
-    static rotateCoordinate(pos, size) {
+    // entity offset is used for dealing with things like curved rail which have weird anchor points 
+    static rotateCoordinate(pos, size, entityOffset = {w: 1, h: 1}) {
         let newPos = {};
         newPos.x = size/2 + pos.y; // Calculate the new X coordinate
         newPos.y = size/2 - pos.x; // Calculate the new Y coordinate
+        //from lower right quadrant
+        if (pos.x > size/2 && pos.y  > 0) {
+            newPos.y -= entityOffset.w;
+        // from lower left quardrant
+        } else if (pos.x < size/2 && pos.y > 0) {
+            newPos.y -= entityOffset.w;
+        // upper left quadrant
+        } else if (pos.x < size/2 && pos.y < 0) {
+            newPos.y -= entityOffset.w;
+        }
         return newPos;
         
     }
@@ -130,12 +141,12 @@ class RailSection extends Blueprint {
     }
     createCurvedRail({allowOverlap = false, rotate = false} = {}) {
         let rails = [    
-               { ent: 'straight-rail', pos: { x: 2, y: this.topY }, dir: Blueprint.RIGHT },
-               { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize/2 - 2 }, dir: Blueprint.UP },
-               { ent: 'curved-rail', pos:  { x: 8, y: this.topY + 2 }, dir: 3 },
-               { ent: 'curved-rail', pos:  { x: 6, y: this.bottomY + 2 }, dir: 3 },
-               { ent: 'curved-rail', pos:  { x: 8 + 2*this.trackSpacing, y: this.bottomY + 16 }, dir: 0 },
-               { ent: 'curved-rail', pos:  { x: 16 + 2*this.trackSpacing, y: this.gridSize/2 - 6 }, dir: 0 },
+               { ent: 'straight-rail', pos: { x: 2, y: this.topY }, dir: Blueprint.RIGHT, entityOffset: {w: 2, h: 2} },
+               { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize/2 - 2 }, dir: Blueprint.UP , entityOffset: {w: 2, h: 2}},
+               { ent: 'curved-rail', pos:  { x: 8, y: this.topY + 2 }, dir: 3, entityOffset: {w: -2, h: 0} },
+               { ent: 'curved-rail', pos:  { x: 6, y: this.bottomY + 2 }, dir: 3,  entityOffset: {w: -2, h: 0}},
+               { ent: 'curved-rail', pos:  { x: 8 + 2*this.trackSpacing, y: this.bottomY + 16 }, dir: 0,  entityOffset: {w: -2, h: 0} },
+               { ent: 'curved-rail', pos:  { x: 16 + 2*this.trackSpacing, y: this.gridSize/2 - 6 }, dir: 0,  entityOffset: {w: -2, h: 0} },
             ];
 
 
@@ -145,12 +156,12 @@ class RailSection extends Blueprint {
         ]
         if (rotate) {
             rails.map(r => {
-                r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize);
+                r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset);
                 r.dir = RailSection.rotateDirection(r.dir);
             })
             runs.map(r => {
-                r.to = RailSection.rotateCoordinate(r.to, this.gridSize);
-                r.from = RailSection.rotateCoordinate(r.from, this.gridSize);
+                r.to = RailSection.rotateCoordinate(r.to, this.gridSize,  {w: -2, h: -2});
+                r.from = RailSection.rotateCoordinate(r.from, this.gridSize,  {w: -2, h: -2});
             })
         } 
 
