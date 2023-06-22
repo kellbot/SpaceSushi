@@ -68,6 +68,11 @@
   resolved "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz"
   integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
 
+"@kellbot/factorio-blueprint@^2.6.6":
+  version "2.6.6"
+  resolved "https://registry.npmjs.org/@kellbot/factorio-blueprint/-/factorio-blueprint-2.6.6.tgz"
+  integrity sha512-pCZRbZib/S+iMLBCqcU0lX21J/tMqkeBEt4OpzGoO5HwTLmJTpf+XQHxclpdsEduetFqNOO3omu3ruZlV2/33A==
+
 "@mdi/font@7.0.96":
   version "7.0.96"
   resolved "https://registry.npmjs.org/@mdi/font/-/font-7.0.96.tgz"
@@ -511,11 +516,6 @@ esutils@^2.0.2:
   version "2.0.3"
   resolved "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
-
-factorio-blueprint@^2.6.4:
-  version "2.6.4"
-  resolved "https://registry.npmjs.org/factorio-blueprint/-/factorio-blueprint-2.6.4.tgz"
-  integrity sha512-EwyrtJ5N+aTJ6M5+qqjD5w8itp1NaImMMB9lfR8EWb/sKvPvCq7Af2X6OltPlmJ4OGjewOae7UfbDJ2jlMt3CQ==
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"

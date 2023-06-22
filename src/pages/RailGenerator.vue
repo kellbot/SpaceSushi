@@ -3,55 +3,29 @@
     <v-card>
       <v-card-title>Coming Soon</v-card-title>
       <v-card-text>
-        A tool for generating rail books
+        {{ rb.generate() }}
       </v-card-text>
     </v-card>
   </v-container>
 </template>
   <script>
-  
-
-import ProducerSelector from '@/components/ProducerSelector.vue';
-import ItemButton from '@/components/ItemButton.vue';
-import BlueprintHeader from '@/components/BlueprintHeader.vue';
-import { getBlueprintString, getIntermediateProducts } from '@/blueprinter.js';
+import  RailBook  from '@/RailBook.js';
 import { useAppStore } from '@/store/app';
-import { storeToRefs } from 'pinia'
+// import { storeToRefs } from 'pinia'
 
 
-let appStore = useAppStore();
-
-const { selectedRecipes } = storeToRefs(appStore);
+// let appStore = useAppStore();
 
 export default {
   data: () => ({
-    selectedRecipes: selectedRecipes,
-    items: appStore.items,
-    recipes: appStore.recipes,
-    icons: appStore.icons,
-    blueprintString: ''
+    rb: new RailBook()
   }),
   methods: {
-    intermedateRecipes() {
-      return getIntermediateProducts(this.selectedRecipes,
-       ['assembling-machine-1', 'assembling-machine-2', 'assembling-machine-3', 'electric-furnace', 'chemical-plant'],
-       true);
-    },
-    createBlueprintString() {
-      return getBlueprintString(Array.from(new Set(this.selectedRecipes.concat(this.intermedateRecipes(this.selectedRecipes)))))
-    },
     generate() {
-      this.blueprintString = this.createBlueprintString(this.selectedRecipes);
+      this.rb.generate();
     },
-    async copyCode() {
-      await navigator.clipboard.writeText(this.blueprintString);
-      this.copyText = "Copied"
-    }
   },
   components: {
-    ProducerSelector,
-    ItemButton,
-    BlueprintHeader
   }
 }
 </script>
