@@ -3,7 +3,13 @@
     <v-card>
       <v-card-title>Coming Soon</v-card-title>
       <v-card-text>
-        {{ rb.generate() }}
+        <v-btn @click="generate()">
+          Generate
+        </v-btn>
+        <v-btn @click="copyCode">
+          Copy
+        </v-btn>
+        {{ blueprintString }}
       </v-card-text>
     </v-card>
   </v-container>
@@ -18,12 +24,17 @@ import { useAppStore } from '@/store/app';
 
 export default {
   data: () => ({
-    rb: new RailBook()
+    rb: new RailBook(),
+    blueprintString: ''
   }),
   methods: {
     generate() {
-      this.rb.generate();
+      this.blueprintString = this.rb.generate();
     },
+    async copyCode() {
+      await navigator.clipboard.writeText(this.blueprintString);
+      this.copyText = "Copied"
+    }
   },
   components: {
   }

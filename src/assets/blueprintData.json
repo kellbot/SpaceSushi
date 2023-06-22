@@ -28,5 +28,8 @@
         "type": "item",
         "swidth": 3,
         "height": 2
+    },
+    "frozen_snow_0": {
+        "type": "tile"
     }
 }
