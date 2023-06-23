@@ -5,7 +5,7 @@ export default class RailBook {
     constructor() {
         // ** These things should be customizable //
         this.trackSpacing = 8; // The distance between track centers aka two more than the open spaces
-        this.gridSize = 48; // How big are the grid snaps, defaults to one chunk
+        this.gridSize = 49; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
 
         // ***** //
@@ -24,16 +24,17 @@ export default class RailBook {
 
     creatRailTest() {
         let test = new RailSection(this);
-        let start = {x: 4, y: 9};
-        for (let i = start.x; i <= 30; i+=2){
-            test.createEntity('straight_rail', {x: i, y: 8}, 2);
-            test.createEntity('straight_rail', {x: i, y: 16}, 2);
+        test.name = "From Manual";
+        let start = {x: 2.5, y: 14.5};
+        for (let i = start.x; i <= start.x + 36; i+=2){
+            test.createEntity('straight_rail', {x: i, y: start.y}, 2);
+            test.createEntity('straight_rail', {x: i, y: start.y + 6}, 2);
         }
-        test.createEntity('big-electric-pole', {x: start.x - 1, y: 11});
-        test.createEntity('big-electric-pole', {x: start.x + 15, y: 11})
-        test.createEntity('big-electric-pole', {x: start.x + 31, y: 11});
+        test.createEntity('big-electric-pole', {x: start.x - 1, y: start.y + 3});
+        test.createEntity('big-electric-pole', {x: start.x + 15, y: start.y  + 3})
+        test.createEntity('big-electric-pole', {x: start.x + 31, y: start.y + 3});
         
-        test.snapping = {absolute: true, grid: {x: 24, y:24}, position: {x: 0, y:0}};
+        //test.snapping = {absolute: true, grid: {x: 36, y:36}};
         return test;
     }
 
@@ -107,7 +108,8 @@ export default class RailBook {
     generate() {
         console.log(this);
         //this.blueprints.forEach(bp => { bp.addLandfill() });
-        return Blueprint.toBook(this.blueprints);
+        //return Blueprint.toBook(this.blueprints);
+        return this.blueprints[1].encode();
     }
 }
 
