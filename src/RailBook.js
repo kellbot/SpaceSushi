@@ -4,7 +4,7 @@ import Blueprint from '@kellbot/factorio-blueprint';
 export default class RailBook {
     constructor() {
         // ** These things should be customizable //
-        this.trackSpacing = 6; //how many spaces between tracks
+        this.trackSpacing = 8; // The distance between track centers aka two more than the open spaces
         this.gridSize = 48; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
 
@@ -13,12 +13,28 @@ export default class RailBook {
         this.blueprints =
             [
                 // Straight rails
-                this.createStraightBlueprint({ name: "Simple Straight Track" }), // Basic straight rail
-                this.createStraightBlueprint({ poleSpacing: 2, label: "Simple Straight Track" }), // Basic straight rail, fewer power poles
-                this.createCornerBlueprint(),
-                this.createIntersectionT(),
-                this.createCurveTest()
+                this.createStraightBlueprint({ name: "Straight Track" }), // Basic straight rail
+                // this.createStraightBlueprint({ poleSpacing: 2, label: "Simple Straight Track" }), // Basic straight rail, fewer power poles
+                // this.createCornerBlueprint(),
+                // this.createIntersectionT(),
+                // this.createCurveTest(),
+                this.creatRailTest()
             ];
+    }
+
+    creatRailTest() {
+        let test = new RailSection(this);
+        let start = {x: 4, y: 9};
+        for (let i = start.x; i <= 30; i+=2){
+            test.createEntity('straight_rail', {x: i, y: 8}, 2);
+            test.createEntity('straight_rail', {x: i, y: 16}, 2);
+        }
+        test.createEntity('big-electric-pole', {x: start.x - 1, y: 11});
+        test.createEntity('big-electric-pole', {x: start.x + 15, y: 11})
+        test.createEntity('big-electric-pole', {x: start.x + 31, y: 11});
+        
+        test.snapping = {absolute: true, grid: {x: 24, y:24}, position: {x: 0, y:0}};
+        return test;
     }
 
     createCurveTest() {
@@ -31,11 +47,12 @@ export default class RailBook {
 
     }
 
-    createStraightBlueprint({ poleSpacing = 3, label = 'Straight Rail', connections = ["red", "green"] } = {}) {
+    createStraightBlueprint({label = 'Straight Rail', connections = ["red", "green"] } = {}) {
         let straightRail = new RailSection(this);
         straightRail.name = label;
         straightRail.description = "A straight section of track";
-        straightRail.createStraightRail({ poleSpacing: poleSpacing, label: label, connections: connections });
+        straightRail.createTwoLanesAcross();
+        straightRail.createPowerAcross();
         straightRail.setSnapping();
         return straightRail;
     }
@@ -88,7 +105,8 @@ export default class RailBook {
 
 
     generate() {
-        this.blueprints.forEach(bp => { bp.addLandfill() });
+        console.log(this);
+        //this.blueprints.forEach(bp => { bp.addLandfill() });
         return Blueprint.toBook(this.blueprints);
     }
 }
@@ -99,17 +117,38 @@ class RailSection extends Blueprint {
         this.parent = parent;
         this.gridSize = parent.gridSize;
         this.trackSpacing = parent.trackSpacing;
-        this.topY = 0 - parent.trackSpacing / 2 - 2
-        this.bottomY = 0 + parent.trackSpacing / 2;
-        this.leftX = parent.gridSize / 2 - parent.trackSpacing / 2 - 2;
-        this.rightX = parent.gridSize / 2 + parent.trackSpacing / 2;
+
+        this.centerLine = this.gridSize/2;
+        // rails are weird
+        this.zeroOffset = -0.5;
+
+        this.guides = {
+            top: this.centerLine - this.trackSpacing/2,
+            bottom: this.centerLine + this.trackSpacing/2,
+            left: this.centerLine - this.trackSpacing/2,
+            right: this.centerLine + this.trackSpacing/2
+        }
         this.signals = []; // array of signals entities, for easier manipulation later
         this.poles = []; //Poles, which likely need to be connected
+    }
 
-        console.log("Rotation test");
-        let test = { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize / 2 - 2 }, dir: Blueprint.UP };
-        console.log(test.pos);
-        console.log(RailSection.rotateCoordinate(test.pos, this.gridSize));
+    createTwoLanesAcross(offset = {x: 0, y: 0}) {
+        for (let i = this.zeroOffset; i < this.gridSize; i+=2){
+            this.createEntity('straight_rail', {x: i + offset.x, y: this.guides.top + offset.y}, Blueprint.RIGHT);
+            this.createEntity('straight_rail', {x: i + offset.x, y: this.guides.bottom + offset.y}, Blueprint.LEFT);
+        }
+    }
+
+    createPowerAcross(offset= {x: 0, y: 0}, connections = []) {
+        let poleCount = Math.ceil(this.gridSize / 30) + 1;
+        if (poleCount > 3) {
+            throw new Error("Sorry I can't count above 3, use smaller blocks.");
+        }
+        let poleDistance = this.gridSize / (poleCount - 1);
+
+        for (let i = this.zeroOffset; i < this.gridSize; i+=poleDistance){
+            this.createEntity('big-electric-pole', {x: i + offset.x, y: this.centerLine + offset.y - this.zeroOffset});
+        }
     }
 
     static flip(num) {
@@ -166,7 +205,7 @@ class RailSection extends Blueprint {
                     [0, 0, 0, 1, 1],
                     [0, 0, 0, 1, 1],
                 ];
-                let offset= {x: 0, y: 0};
+                let offset = { x: 0, y: 0 };
                 switch (e.direction) {
                     case 0:
                         offset = { x: -3, y: -4 };
@@ -205,185 +244,185 @@ class RailSection extends Blueprint {
                 landfillShape.forEach((data, row) => {
                     data.forEach((hasLandfill, col) => {
                         if (hasLandfill) {
-                            let nudge = {x: 0, y: 0};
-                    
+                            let nudge = { x: 0, y: 0 };
+
                             // if (e.position.y > 0 && e.position.x > this.gridSize/2) nudge.y += 0.5;
                             //if (e.position.x < 24) nudge.x -= 0.5;
                             this.createTile('landfill', { x: e.position.x + col + offset.x + nudge.x, y: e.position.y + row + offset.y + nudge.y });
                         }
                     });
                 })
-            
+
             } else {
                 for (let x = 0; x < e.size.x; x++) {
                     for (let y = 0; y < e.size.y; y++) {
                         if (e.diretion % 2 == 0) {
                             this.createTile('landfill', { x: e.position.x + x, y: e.position.y + y });
-                        } else  {
-                            let offset = {x: 0, y: 0};
-                             if  (e.direction == 7 || e.direction == 3) {
-                                 offset.y = e.position.y < 0 ? 0 : -1;
+                        } else {
+                            let offset = { x: 0, y: 0 };
+                            if (e.direction == 7 || e.direction == 3) {
+                                offset.y = e.position.y < 0 ? 0 : -1;
                             } else if (e.direction == 1 || e.direction == 5) {
                                 offset.x = e.position.y > 0 ? -1 : 0;
                             }
-                            this.createTile('landfill', { x: e.position.x + x + offset.x, y: e.position.y + y + offset.y});
+                            this.createTile('landfill', { x: e.position.x + x + offset.x, y: e.position.y + y + offset.y });
                         }
                     }
                 }
             }
-        
-        })
-}
-createCurvedRail({ allowOverlap = false, rotate = false } = {}) {
-    let rails = [
-        { ent: 'straight-rail', pos: { x: 2, y: this.topY }, dir: Blueprint.RIGHT, entityOffset: { w: 2, h: 2 } },
-        { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize / 2 - 2 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
-        { ent: 'curved-rail', pos: { x: 8, y: this.topY + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
-        { ent: 'curved-rail', pos: { x: 6, y: this.bottomY + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
-        { ent: 'curved-rail', pos: { x: 8 + 2 * this.trackSpacing, y: this.bottomY + 16 }, dir: 0, entityOffset: { w: -2, h: 0 } },
-        { ent: 'curved-rail', pos: { x: 16 + 2 * this.trackSpacing, y: this.gridSize / 2 - 6 }, dir: 0, entityOffset: { w: -2, h: 0 } },
-    ];
 
-
-    let runs = [
-        { from: { x: 10, y: this.topY + 4 }, to: { x: 12 + 2 * this.trackSpacing, y: this.topY + 18 } },
-        { from: { x: 8, y: this.bottomY + 4 }, to: { x: 4 + 2 * this.trackSpacing, y: this.bottomY + 12 } }
-    ]
-    if (rotate) {
-        rails.map(r => {
-            r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset);
-            r.dir = RailSection.rotateDirection(r.dir);
-        })
-        runs.map(r => {
-            r.to = RailSection.rotateCoordinate(r.to, this.gridSize, { w: -2, h: -2 });
-            r.from = RailSection.rotateCoordinate(r.from, this.gridSize, { w: -2, h: -2 });
         })
     }
+    createCurvedRail({ allowOverlap = false, rotate = false } = {}) {
+        let rails = [
+            { ent: 'straight-rail', pos: { x: 2, y: this.topY }, dir: Blueprint.RIGHT, entityOffset: { w: 2, h: 2 } },
+            { ent: 'straight-rail', pos: { x: this.rightX, y: this.gridSize / 2 - 2 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
+            { ent: 'curved-rail', pos: { x: 8, y: this.topY + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: 6, y: this.bottomY + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: 8 + 2 * this.trackSpacing, y: this.bottomY + 16 }, dir: 0, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: 16 + 2 * this.trackSpacing, y: this.gridSize / 2 - 6 }, dir: 0, entityOffset: { w: -2, h: 0 } },
+        ];
 
-    rails.forEach(r => {
-        this.createEntity(r.ent, r.pos, r.dir, allowOverlap);
-    });
 
-    runs.forEach(r => {
-        this.runRail(r.from, r.to);
-    })
-
-    let polePosistions = [
-        { x: -1, y: -1 },
-        { x: this.leftX - 5, y: this.bottomY + 5 },
-        { x: this.gridSize / 2 - 1, y: this.gridSize / 2 - 1 }
-    ];
-    if (rotate) {
-        polePosistions.map(p => {
-            p = RailSection.rotateCoordinate(p, this.gridSize);
-        })
-    }
-    polePosistions.forEach(position => {
-        let pole;
-        try {
-            if (pole = this.createEntity('big-electric-pole', position, 0, true))
-                this.poles.push(pole);
-        } catch (e) {
-            console.log(e);
-            console.log(position);
+        let runs = [
+            { from: { x: 10, y: this.topY + 4 }, to: { x: 12 + 2 * this.trackSpacing, y: this.topY + 18 } },
+            { from: { x: 8, y: this.bottomY + 4 }, to: { x: 4 + 2 * this.trackSpacing, y: this.bottomY + 12 } }
+        ]
+        if (rotate) {
+            rails.map(r => {
+                r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset);
+                r.dir = RailSection.rotateDirection(r.dir);
+            })
+            runs.map(r => {
+                r.to = RailSection.rotateCoordinate(r.to, this.gridSize, { w: -2, h: -2 });
+                r.from = RailSection.rotateCoordinate(r.from, this.gridSize, { w: -2, h: -2 });
+            })
         }
-    });
 
-}
-createStraightRail({ poleSpacing = 3, label = 'Straight Rail', connections =["red", "green"] } = {}) {
-    this.addRailConnections({ left: true, right: true });
-    this.runRail({ x: 2, y: this.topY }, { x: this.gridSize - 2, y: this.topY });
-    this.runRail({ x: 2, y: this.bottomY }, { x: this.gridSize - 2, y: this.bottomY });
-    this.runPower(0, this.gridSize, poleSpacing, connections);
-}
-setSnapping() {
-    this.fixCenter({ x: 0, y: this.gridSize / 2 * -1 });
-    this.snapping = {
-        grid: { x: this.gridSize, y: this.gridSize },
-        position: { x: 1, y: 1 },
-        absolute: true
-    };
-}
-//adds two pieces of rail on the sides that will connect to other sections
-addRailConnections(directions = { left: true, right: true }) {
-    if (directions.left) {
-        this.createEntity('straight-rail', { x: 0, y: this.topY }, Blueprint.RIGHT, true);
-        this.createEntity('straight-rail', { x: 0, y: this.bottomY }, Blueprint.RIGHT, true);
-        this.createEntity('rail-signal', { x: 0, y: this.topY - 1 }, Blueprint.RIGHT, true);
-    }
-    if (directions.right) {
-        this.createEntity('straight-rail', { x: this.gridSize, y: this.topY }, Blueprint.RIGHT, true);
-        this.createEntity('straight-rail', { x: this.gridSize, y: this.bottomY }, Blueprint.RIGHT, true);
-        this.createEntity('rail-signal', { x: this.gridSize - 1, y: this.bottomY + 2 }, Blueprint.LEFT, true);
+        rails.forEach(r => {
+            this.createEntity(r.ent, r.pos, r.dir, allowOverlap);
+        });
 
-    }
-    if (directions.bottom) {
-        this.createEntity('straight-rail', { x: this.leftX, y: this.gridSize / 2 }, Blueprint.UP, true);
-        this.createEntity('straight-rail', { x: this.rightX, y: this.gridSize / 2 }, Blueprint.DOWN, true);
-        this.createEntity('rail-signal', { x: this.leftX - 1, y: this.gridSize / 2 }, Blueprint.UP, true);
-    }
-    if (directions.top) {
-        this.createEntity('straight-rail', { x: this.leftX, y: -this.gridSize / 2 }, Blueprint.UP, true);
-        this.createEntity('straight-rail', { x: this.rightX, y: -this.gridSize / 2 }, Blueprint.DOWN, true);
-        this.createEntity('rail-signal', { x: this.rightX + 1, y: -this.gridSize / 2 }, Blueprint.UP, true);
-    }
-}
+        runs.forEach(r => {
+            this.runRail(r.from, r.to);
+        })
 
-wirePoles(connections = ["red", "green"]) {
-    this.poles.forEach((pole, i) => {
-        if (i > 0) {
-            connections.forEach(c => {
-                pole.connect(this.poles[i - 1], null, null, c)
-            });
+        let polePosistions = [
+            { x: -1, y: -1 },
+            { x: this.leftX - 5, y: this.bottomY + 5 },
+            { x: this.gridSize / 2 - 1, y: this.gridSize / 2 - 1 }
+        ];
+        if (rotate) {
+            polePosistions.map(p => {
+                p = RailSection.rotateCoordinate(p, this.gridSize);
+            })
         }
-    })
-}
-runRail(from = { x: 0, y: 0 }, to = { x: this.gridSize, y: 0 }) {
+        polePosistions.forEach(position => {
+            let pole;
+            try {
+                if (pole = this.createEntity('big-electric-pole', position, 0, true))
+                    this.poles.push(pole);
+            } catch (e) {
+                console.log(e);
+                console.log(position);
+            }
+        });
 
-    let direction;
-    if (from == to) return false
-    // Determine direction
-    if (from.x == to.x) {
-        direction = (from.y > to.y) ? Blueprint.DOWN : Blueprint.UP;
-    } else if (from.y == to.y) {
-        direction = (from.x > to.x) ? Blueprint.LEFT : Blueprint.RIGHT;
-    } else if (from.x > to.x) {
-        direction = (from.y > to.y) ? 5 : 3;
-    } else {
-        direction = (from.y > to.y) ? 7 : 1;
     }
-    if (direction != Blueprint.UP && direction != Blueprint.DOWN);
-    let xJump = from.x > to.x ? -2 : 2;
+    createStraightRail({ poleSpacing = 3, label = 'Straight Rail', connections = ["red", "green"] } = {}) {
+        this.addRailConnections({ left: true, right: true });
+        this.runRail({ x: 2, y: this.topY }, { x: this.gridSize - 2, y: this.topY });
+        this.runRail({ x: 2, y: this.bottomY }, { x: this.gridSize - 2, y: this.bottomY });
+        this.runPower({x: 0.5, y: this.topY + 4}, this.gridSize, poleSpacing, connections);
+    }
+    setSnapping() {
+        //this.fixCenter({ x: 0, y: this.gridSize / 2 * -1 });
+        this.snapping = {
+            grid: { x: this.gridSize, y: this.gridSize },
+            position: { x: 1, y: 1 },
+            absolute: true
+        };
+    }
+    //adds two pieces of rail on the sides that will connect to other sections
+    addRailConnections(directions = { left: true, right: true }) {
+        if (directions.left) {
+            this.createEntity('straight-rail', { x: 0, y: this.topY }, Blueprint.RIGHT, true);
+            this.createEntity('straight-rail', { x: 0, y: this.bottomY }, Blueprint.RIGHT, true);
+            this.createEntity('rail-signal', { x: 0, y: this.topY - 1 }, Blueprint.RIGHT, true);
+        }
+        if (directions.right) {
+            this.createEntity('straight-rail', { x: this.gridSize - 2, y: this.topY }, Blueprint.RIGHT, true);
+            this.createEntity('straight-rail', { x: this.gridSize - 2, y: this.bottomY }, Blueprint.RIGHT, true);
+            this.createEntity('rail-signal', { x: this.gridSize - 1, y: this.bottomY + 2 }, Blueprint.LEFT, true);
 
+        }
+        if (directions.bottom) {
+            this.createEntity('straight-rail', { x: this.leftX, y: this.gridSize / 2 - 2 }, Blueprint.UP, true);
+            this.createEntity('straight-rail', { x: this.rightX, y: this.gridSize / 2 - 2 }, Blueprint.DOWN, true);
+            this.createEntity('rail-signal', { x: this.leftX - 1, y: this.gridSize / 2 }, Blueprint.UP, true);
+        }
+        if (directions.top) {
+            this.createEntity('straight-rail', { x: this.leftX, y: -this.gridSize / 2 }, Blueprint.UP, true);
+            this.createEntity('straight-rail', { x: this.rightX, y: -this.gridSize / 2 }, Blueprint.DOWN, true);
+            this.createEntity('rail-signal', { x: this.rightX + 1, y: -this.gridSize / 2 }, Blueprint.UP, true);
+        }
+    }
 
-    let j = 0;
-    for (let i = from.x; i <= to.x; i += xJump) {
-        // straight across
-        if (from.y == to.y) {
-            this.createEntity('straight-rail', { x: i, y: from.y }, direction, true);
-            //diagonal
-        } else if (direction == 7) {
-           this.createEntity('straight-rail', { x: i, y: from.y - xJump * j - 2 }, direction, true);
-           if (i + 1 <= to.x)  this.createEntity('straight-rail', { x: i, y: from.y - xJump * j - 4 }, RailSection.flip(direction), true);
+    wirePoles(connections = ["red", "green"]) {
+        this.poles.forEach((pole, i) => {
+            if (i > 0) {
+                connections.forEach(c => {
+                    pole.connect(this.poles[i - 1], null, null, c)
+                });
+            }
+        })
+    }
+    runRail(from = { x: 0, y: 0 }, to = { x: this.gridSize, y: 0 }) {
 
+        let direction;
+        if (from == to) return false
+        // Determine direction
+        if (from.x == to.x) {
+            direction = (from.y > to.y) ? Blueprint.DOWN : Blueprint.UP;
+        } else if (from.y == to.y) {
+            direction = (from.x > to.x) ? Blueprint.RIGHT : Blueprint.RIGHT;
+        } else if (from.x > to.x) {
+            direction = (from.y > to.y) ? 5 : 3;
         } else {
-            this.createEntity('straight-rail', { x: i, y: from.y + xJump * j }, direction, true);
-            if (i + 1 <= to.x) this.createEntity('straight-rail', { x: i + 2, y: from.y + xJump * j }, RailSection.flip(direction), true);
+            direction = (from.y > to.y) ? 7 : 1;
         }
-        j++;
+        if (direction != Blueprint.UP && direction != Blueprint.DOWN);
+        let xJump = from.x > to.x ? -2 : 2;
+
+
+        let j = 0;
+        for (let i = from.x; i <= to.x; i += xJump) {
+            // straight across
+            if (from.y == to.y) {
+                this.createEntity('straight-rail', { x: i, y: from.y }, direction, true);
+                //diagonal
+            } else if (direction == 7) {
+                this.createEntity('straight-rail', { x: i, y: from.y - xJump * j - 2 }, direction, true);
+                if (i + 1 <= to.x) this.createEntity('straight-rail', { x: i, y: from.y - xJump * j - 4 }, RailSection.flip(direction), true);
+
+            } else {
+                this.createEntity('straight-rail', { x: i, y: from.y + xJump * j }, direction, true);
+                if (i + 1 <= to.x) this.createEntity('straight-rail', { x: i + 2, y: from.y + xJump * j }, RailSection.flip(direction), true);
+            }
+            j++;
+
+        }
+    }
+    runPower(from, to, spacing = 3, connections = ["red", "green"]) {
+        let distance = to - from.x;
+
+        for (let i = from.x; i <= to; i += distance / spacing) {
+            this.poles.push(this.createEntity('big-electric-pole', { x: i, y: from.y }));
+        }
+        this.wirePoles(connections);
+
 
     }
-}
-runPower(from, to, spacing = 3, connections = ["red", "green"]) {
-    let distance = to - from;
-
-    for (let i = from; i <= to; i += Math.floor(distance / spacing)) {
-        this.poles.push(this.createEntity('big-electric-pole', { x: i - 1, y: -1 }));
-    }
-    this.wirePoles(connections);
-
-
-}
 
 }
 
