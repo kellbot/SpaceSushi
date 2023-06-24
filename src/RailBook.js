@@ -3,9 +3,9 @@ import { Exception } from 'sass';
 //import seData from './assets/data.json';
 
 export default class RailBook {
-    constructor({gridSize=48}={}) {
+    constructor({gridSize=48, trackSpacing = 6 }={}) {
         // ** These things should be customizable //
-        this.trackSpacing = 8; // The distance between track centers aka two more than the open spaces
+        this.trackSpacing = trackSpacing; // The distance between track centers aka two more than the open spaces
         this.gridSize = gridSize; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
 
@@ -108,10 +108,10 @@ class RailSection extends Blueprint {
 
         this.guides = { zero:  0.5, max: this.gridSize + 0.5};
         this.guides.center = this.gridSize/2 - this.guides.zero
-        this.guides.top = this.guides.center - 3;
-        this.guides.bottom = this.guides.top + 6; 
-        this.guides.left = this.guides.center - 3;
-        this.guides.right=  this.guides.center + 3;
+        this.guides.top = this.guides.center - this.trackSpacing/2;
+        this.guides.bottom = this.guides.top + this.trackSpacing; 
+        this.guides.left = this.guides.center - this.trackSpacing/2;
+        this.guides.right=  this.guides.center + this.trackSpacing/2;
         
         this.signals = []; // array of signals entities, for easier manipulation later
         this.poles = []; //Poles, which likely need to be connected
@@ -279,7 +279,7 @@ class RailSection extends Blueprint {
             // { ent: 'straight-rail', pos: { x: this.guides.right, y: this.guides.max - 4 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
             { ent: 'curved-rail', pos: { x: this.guides.zero + 6, y: this.guides.top + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
             { ent: 'curved-rail', pos: { x: this.guides.zero + 4, y: this.guides.bottom + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
-            { ent: 'curved-rail', pos: { x: this.guides.center - this.trackSpacing/2 + 2, y: this.guides.max - 4 }, dir: 0, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: this.guides.center - this.trackSpacing/2, y: this.guides.max - 4 }, dir: 0, entityOffset: { w: -2, h: 0 } },
             { ent: 'curved-rail', pos: { x: this.guides.center + this.trackSpacing/2, y: this.guides.max - 6 }, dir: 0, entityOffset: { w: -2, h: 0 } },
         ];
 
@@ -335,7 +335,7 @@ class RailSection extends Blueprint {
             sections.push(  { entity: 'straight-rail', position:  { x: this.guides.max - 2, y: this.guides.top }, direction: Blueprint.RIGHT});
             sections.push(  { entity: 'straight-rail', position: { x: this.guides.max - 2, y: this.guides.bottom }, direction: Blueprint.RIGHT});
             if (signals) sections.push({  entity: 'rail-signal', position: { x: this.guides.max - 1, y: this.guides.bottom + 2 }, direction: Blueprint.LEFT});
-            if (poles) sections.push({  entity: 'big-electric-pole', position: { x: this.guides.max, y: this.guides.center }, direction: Blueprint.RIGHT });
+            if (poles) sections.push({  entity: 'big-electric-pole', position: { x: this.guides.max - 1, y: this.guides.center }, direction: Blueprint.RIGHT });
         
         }
         if (directions.bottom) {

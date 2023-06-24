@@ -38,7 +38,9 @@ export default {
   }),
   methods: {
     generate() {
-      this.blueprintString = new RailBook({gridSize: this.gridSize}).generate();
+      let opts = {gridSize: this.gridSize, trackSpacing: this.trackSpacing};
+      console.log(opts);
+      this.blueprintString = new RailBook(opts).generate();
     },
     async copyCode() {
       await navigator.clipboard.writeText(this.blueprintString);
