@@ -3,6 +3,7 @@
     <v-card>
       <v-card-text>
         <RailSlider label="Grid Size" :max=96 :min=36 :step=4 v-model="gridSize" />
+        <RailSlider label="Track Spacing" :max=10 :min=4 :step=2 v-model="trackSpacing" />
       </v-card-text>
     </v-card>
     <v-card>
@@ -32,7 +33,7 @@ const { railSettings } = storeToRefs(appStore);
 export default {
   data: () => ({
     gridSize: 48,// railSettings.gridSize,
-    trackSpacing: railSettings.trackSpacing,
+    trackSpacing: 6, //railSettings.trackSpacing,
     blueprintString: '',    
   }),
   methods: {
