@@ -1,21 +1,24 @@
 <template>
+   
 <div class="text-caption">
         {{ label  }}
       </div>
         <v-slider
-    v-model="sValue"
-    model-value="modelValue"
+    :modelValue = "modelValue"
+    @input="$emit('update:modelValue', $event.target.value)"
     class="align-center"
     :max="max"
     :min="min"
     :step="step"
     hide-details
   >
-    <template v-slot:append>
+  <template v-slot:append>
       <v-text-field
-        v-model="sValue"
+      :value = "modelValue"
+         @input="$emit('update:modelValue', $event.target.value)"
         hide-details
         single-line
+        :step="step"
         density="compact"
         type="number"
         style="width: 70px"
@@ -24,16 +27,13 @@
   </v-slider>
 </template>
 <script>
+
 export default {
-  data: () => ({
-    sValue: 48
-  }),
-  props: {
-    label: String,
-    min: Number,
-    max: Number,
-    step: Number,
-    modelValue: Number
-  }
+  props: ['modelValue', 'label', 'min', 'max', 'step'],
+
+  emits: 
+    ['update:modelValue']
+  
 }
+
 </script>

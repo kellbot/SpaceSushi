@@ -2,11 +2,11 @@
   <v-container>
     <v-card>
       <v-card-text>
-        <RailSlider label="Grid Size" :max=96 :min=36 :step=4 :model-value="gridSize" />
+        <RailSlider label="Grid Size" :max=96 :min=36 :step=4 v-model="gridSize" />
       </v-card-text>
     </v-card>
     <v-card>
-      <v-card-title>Coming Soon</v-card-title>
+      <v-card-title>Create blueprint with grid size {{ gridSize }}</v-card-title>
       <v-card-text>
         <v-btn @click="generate()">
           Generate
@@ -31,7 +31,7 @@ const { railSettings } = storeToRefs(appStore);
 
 export default {
   data: () => ({
-    gridSize: railSettings.gridSize,
+    gridSize: 48,// railSettings.gridSize,
     trackSpacing: railSettings.trackSpacing,
     blueprintString: '',    
   }),
