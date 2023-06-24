@@ -33,7 +33,7 @@ const { railSettings } = storeToRefs(appStore);
 export default {
   data: () => ({
     gridSize: 48,// railSettings.gridSize,
-    trackSpacing: 6, //railSettings.trackSpacing,
+    trackSpacing: 8, //railSettings.trackSpacing,
     blueprintString: '',    
   }),
   methods: {

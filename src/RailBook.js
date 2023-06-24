@@ -5,7 +5,7 @@ import { Exception } from 'sass';
 export default class RailBook {
     constructor({gridSize=48, trackSpacing = 6 }={}) {
         // ** These things should be customizable //
-        this.trackSpacing = trackSpacing; // The distance between track centers aka two more than the open spaces
+        this.trackSpacing = trackSpacing +2; // The distance between track centers aka two more than the open spaces
         this.gridSize = gridSize; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
 
@@ -48,9 +48,7 @@ export default class RailBook {
         cornerRail.name = "Curved Track";
         cornerRail.createCurvedRail();
         cornerRail.addRailConnections({ left: true, bottom: true}, true, true);
-        //if (Math.sqrt(Math.pow(this.gridSize/2, 2) * 2) > 30) {
-            cornerRail.createEntity('big-electric-pole', {x: cornerRail.gridSize / 3 - cornerRail.guides.zero - 1 , y: cornerRail.gridSize/3 * 2 - cornerRail.guides.zero + 1}, 0, true);
-        //}
+   
         cornerRail.setSnapping();
         cornerRail.autoConnectPoles();
         return cornerRail;
@@ -59,10 +57,12 @@ export default class RailBook {
     createIntersectionT() {
         let tRail = new RailSection(this);
         tRail.name = "T Intersection";
-        tRail.createTwoLanesAcross();
-        tRail.createCurvedRail();
-        tRail.createCurvedRail({ rotate: true });
+        tRail.createTwoLanesAcross()
         tRail.addRailConnections({ left: true, bottom: true, right: true }, true, true);
+;
+        tRail.createPowerAcross();
+        tRail.createCurvedRail({power: true});
+        tRail.createCurvedRail({ power: true, rotate: true });
         //Signal direction points to rail
         let signalPositions = [
             // top and bottom middle
@@ -72,11 +72,11 @@ export default class RailBook {
             { pos: { x: tRail.guides.zero + 10, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
             { pos: { x: tRail.guides.max - 11, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
             // above / below right curve
-            { pos: { x: tRail.guides.max - 11, y: tRail.guides.center }, dir: Blueprint.RIGHT - 1 },
-            { pos: { x: tRail.guides.max - 10, y: tRail.guides.max - 8}, dir: Blueprint.LEFT - 1 },
+            { pos: { x: tRail.guides.max - 9, y: tRail.guides.center }, dir: Blueprint.RIGHT - 1 },
+            { pos: { x: tRail.guides.center + this.trackSpacing/2 + 6, y: tRail.guides.max - 8}, dir: Blueprint.LEFT - 1 },
             // above / below left curve
-            { pos: { x:  tRail.guides.zero + 10, y: tRail.guides.center }, dir: Blueprint.RIGHT + 1 },
-            { pos: { x: tRail.guides.zero + 9, y: tRail.guides.max - 8 }, dir: Blueprint.LEFT + 1 },
+            { pos: { x:  tRail.guides.zero + 8, y: tRail.guides.center }, dir: Blueprint.RIGHT + 1 },
+            { pos: { x: tRail.guides.center  - this.trackSpacing/2 - 5, y: tRail.guides.max - 8 }, dir: Blueprint.LEFT + 1 },
             // inside triangle curves - only works above a certain size
             { pos: { x: tRail.guides.zero + 17, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT + 1 },
             { pos: { x: tRail.guides.max - 18, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT - 1 },
@@ -85,7 +85,7 @@ export default class RailBook {
         signalPositions.forEach(s => {
             tRail.createEntity('rail-chain-signal', s.pos, s.dir, true);
         });
-        //tRail.setSnapping();
+        tRail.setSnapping();
         return tRail;
 
     }
@@ -105,20 +105,25 @@ class RailSection extends Blueprint {
         this.gridSize = parent.gridSize;
         this.trackSpacing = parent.trackSpacing;
 
-
+        
         this.guides = { zero:  0.5, max: this.gridSize + 0.5};
         this.guides.center = this.gridSize/2 - this.guides.zero
-        this.guides.top = this.guides.center - this.trackSpacing/2;
+        this.guides.top = this.hasEvenSpacing() ? this.guides.center - this.trackSpacing/2 : this.guides.center - this.trackSpacing/2 - 1;
+ 
         this.guides.bottom = this.guides.top + this.trackSpacing; 
         this.guides.left = this.guides.center - this.trackSpacing/2;
         this.guides.right=  this.guides.center + this.trackSpacing/2;
         
         this.signals = []; // array of signals entities, for easier manipulation later
-        this.poles = []; //Poles, which likely need to be connected
-    
-        }
+        this.poles = []; // These are the edge poles which sometimes other stuff needs to connect to
 
-    createTwoLanesAcross(offset = {x: 0, y: 0}) {
+        // track spacing that isn't divisible by 4 causes problems with grid alignment, this is an attempt to combat that
+        this.globalOffset = this.hasEvenSpacing() ? {x: 0, y: 0} : {x: 1, y:1};
+    }
+    hasEvenSpacing() {
+        return this.trackSpacing % 4 == 2;
+    }
+    createTwoLanesAcross(offset = this.globalOffset) {
         for (let i = this.guides.zero; i < this.gridSize; i+=2){
             this.createEntity('straight_rail', {x: i + offset.x, y: this.guides.top + offset.y}, Blueprint.RIGHT);
             this.createEntity('straight_rail', {x: i + offset.x, y: this.guides.bottom + offset.y}, Blueprint.LEFT);
@@ -135,7 +140,7 @@ class RailSection extends Blueprint {
         let poles = [];
         for (let i = this.guides.zero - 1; i < this.gridSize; i+=poleDistance){
             console.log(`i: ${i}, poleDistance: ${poleDistance} `);
-            poles.push(this.createEntity('big-electric-pole', {x: i + offset.x, y: this.guides.center}));
+            poles.push(this.createEntity('big-electric-pole', {x: i + offset.x, y: this.guides.center}, 0, true));
         }
         if (connections.length > 0) {
             poles.forEach((p, i) => {
@@ -271,17 +276,24 @@ class RailSection extends Blueprint {
 
         })
     }
-    createCurvedRail({ allowOverlap = true, rotate = false, offset = {x: 0, y: 0} } = {}) {
+    createCurvedRail({ allowOverlap = true, rotate = false, offset = this.globalOffset, power= true } = {}) {
         if (offset.x % 2 == 1  || offset.y %2 == 1) throw new Error("Offset cannot be odd");
+        let newPoles = []; // newly created poles that need to be connected to edges
 
         let rails = [
             // { ent: 'straight-rail', pos: { x: this.guides.zero + 2, y: this.guides.top }, dir: Blueprint.RIGHT, entityOffset: { w: 2, h: 2 } },
             // { ent: 'straight-rail', pos: { x: this.guides.right, y: this.guides.max - 4 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
-            { ent: 'curved-rail', pos: { x: this.guides.zero + 6, y: this.guides.top + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
-            { ent: 'curved-rail', pos: { x: this.guides.zero + 4, y: this.guides.bottom + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: this.guides.zero + 6, y: this.guides.top + 2 + offset.y }, dir: 3, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: this.guides.zero + 4, y: this.guides.bottom + 2 + offset.y }, dir: 3, entityOffset: { w: -2, h: 0 } },
             { ent: 'curved-rail', pos: { x: this.guides.center - this.trackSpacing/2, y: this.guides.max - 4 }, dir: 0, entityOffset: { w: -2, h: 0 } },
             { ent: 'curved-rail', pos: { x: this.guides.center + this.trackSpacing/2, y: this.guides.max - 6 }, dir: 0, entityOffset: { w: -2, h: 0 } },
+            
         ];
+        if (power) {
+            rails.push(
+                { ent: 'big-electric-pole', pos: {x: this.gridSize / 3 - this.guides.zero - 1 , y: this.gridSize/3 * 2 - this.guides.zero + 1}, dir: 0, entityOffset: {w: 0, h: 0}}
+            );
+            }
 
 
         let runs = [
@@ -305,12 +317,20 @@ class RailSection extends Blueprint {
 
         rails.forEach(r => {
             let pos = {x: r.pos.x + offset.x, y: r.pos.y + offset.y }
-            this.createEntity(r.ent, pos, r.dir, allowOverlap);
+            let newEnt = this.createEntity(r.ent, pos, r.dir, allowOverlap);
+            if (r.ent == 'big-electric-pole'){
+                newPoles.push(newEnt);
+            }
         });
 
         runs.forEach(r => {
             this.runRail(r.from, r.to);
         })
+
+        if (power) {
+            this.connectPower(this.poles.concat(newPoles) );
+        }
+   
 
     }
 
@@ -320,6 +340,9 @@ class RailSection extends Blueprint {
             grid: { x: this.gridSize, y: this.gridSize },
             absolute: true
         };
+        if (this.trackSpacing % 4 == 0) {
+            this.snapping.position = {x: 1, y: 1}
+        }
     }
     //adds two pieces of rail on the sides that will connect to other sections
     addRailConnections(directions = { left: true, right: true},signals= true, poles = false, ) {
@@ -355,12 +378,16 @@ class RailSection extends Blueprint {
     
 
         sections.forEach(s => {
-            this.createEntity(s.entity, s.position, s.direction, true);
+            let newEnt = this.createEntity(s.entity, s.position, s.direction, true);
+            if (s.entity == 'big-electric-pole') this.poles.push(newEnt);
         });
     }
 
     autoConnectPoles(connections = ["red", "green"]) {
         let poles = this.entities.filter(e => (e.name == 'big_electric_pole'));
+        this.connectPower(poles);
+    }
+    connectPower(poles, connections = ["red", "green"]) {
         poles.sort((a, b) => a.position.x - b.position.x);
         connections.forEach(c =>{
             poles.forEach((p,i) => {
@@ -375,7 +402,6 @@ class RailSection extends Blueprint {
                 poles[i-1].neighbours.push(p);
             });
         });
-        console.log(poles);
     }
     runRail(from = { x: 0, y: 0 }, to = { x: this.gridSize, y: 0 }) {
         if (isNaN(from.x) || isNaN(to.x) || isNaN(from.y) || isNaN(to.y)) throw new Error(`Error: Non number given for position ${JSON.stringify(from)} ${JSON.stringify(to)}`);
@@ -414,16 +440,7 @@ class RailSection extends Blueprint {
 
         }
     }
-    runPower(from, to, spacing = 3, connections = ["red", "green"]) {
-        let distance = to - from.x;
-
-        for (let i = from.x; i <= to; i += distance / spacing) {
-            this.poles.push(this.createEntity('big-electric-pole', { x: i, y: from.y }));
-        }
-        this.wirePoles(connections);
-
-
-    }
+  
 
 }
 
