@@ -4,8 +4,8 @@
         {{ label  }}
       </div>
         <v-slider
-    :modelValue = "modelValue"
-    @input="$emit('update:modelValue', $event.target.value)"
+        v-model="boots"
+        @input="$emit('update:modelValue', $event.target.value)"
     class="align-center"
     :max="max"
     :min="min"
@@ -15,7 +15,7 @@
   <template v-slot:append>
       <v-text-field
       :value = "modelValue"
-         @input="$emit('update:modelValue', $event.target.value)"
+         @input="sync( $event.target.value)"
         hide-details
         single-line
         :step="step"
@@ -29,10 +29,23 @@
 <script>
 
 export default {
+    data: () => ({
+        boots: 42
+    }),
   props: ['modelValue', 'label', 'min', 'max', 'step'],
-
+    methods: {
+        sync(val) {
+            this.$emit('update:modelValue', val);
+            this.boots =val;
+        }
+    },
   emits: 
-    ['update:modelValue']
+    ['update:modelValue'],
+    watch: {
+        boots: function(newVal) { 
+            this.$emit('update:modelValue', newVal)
+        }
+      }
   
 }
 
