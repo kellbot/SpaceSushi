@@ -6,7 +6,7 @@ export default class RailBook {
     constructor() {
         // ** These things should be customizable //
         this.trackSpacing = 8; // The distance between track centers aka two more than the open spaces
-        this.gridSize = 36; // How big are the grid snaps, defaults to one chunk
+        this.gridSize = 48; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
 
         // ***** //
@@ -15,9 +15,8 @@ export default class RailBook {
             [
                 // Straight rails
                 this.createStraightBlueprint({ label: `Straight Track [${this.gridSize}]` }), // Basic straight rail
-                // this.createStraightBlueprint({ poleSpacing: 2, label: "Simple Straight Track" }), // Basic straight rail, fewer power poles
                 this.createCornerBlueprint(),
-                // this.createIntersectionT(),
+                this.createIntersectionT(),
                 // this.createCurveTest(),
 
             ];
@@ -40,6 +39,7 @@ export default class RailBook {
         straightRail.createTwoLanesAcross();
         straightRail.createPowerAcross();
         straightRail.setSnapping();
+        straightRail.autoConnectPoles();
         return straightRail;
     }
 
@@ -47,11 +47,11 @@ export default class RailBook {
         let cornerRail = new RailSection(this);
         cornerRail.name = "Curved Track";
         cornerRail.createCurvedRail();
-        cornerRail.addRailConnections({ left: true, bottom: true}, true, true);// if we need an intermediate pole
+        cornerRail.addRailConnections({ left: true, bottom: true}, true, true);
         //if (Math.sqrt(Math.pow(this.gridSize/2, 2) * 2) > 30) {
-            cornerRail.createEntity('big-electric-pole', {x: cornerRail.gridSize / 3 - cornerRail.guides.zero , y: cornerRail.gridSize/3 * 2 - cornerRail.guides.zero}, 0, true);
+            cornerRail.createEntity('big-electric-pole', {x: cornerRail.gridSize / 3 - cornerRail.guides.zero - 1 , y: cornerRail.gridSize/3 * 2 - cornerRail.guides.zero + 1}, 0, true);
         //}
-        //cornerRail.setSnapping();
+        cornerRail.setSnapping();
         cornerRail.autoConnectPoles();
         return cornerRail;
     }
@@ -59,27 +59,27 @@ export default class RailBook {
     createIntersectionT() {
         let tRail = new RailSection(this);
         tRail.name = "T Intersection";
-        tRail.createStraightRail();
-        tRail.createCurvedRail({ allowOverlap: true });
-        tRail.createCurvedRail({ allowOverlap: true, rotate: true });
-        tRail.addRailConnections({ left: true, bottom: true, right: true });
+        tRail.createTwoLanesAcross();
+        tRail.createCurvedRail();
+        tRail.createCurvedRail({ rotate: true });
+        tRail.addRailConnections({ left: true, bottom: true, right: true }, true, true);
         //Signal direction points to rail
         let signalPositions = [
             // top and bottom middle
-            { pos: { x: this.gridSize / 2 - 1, y: tRail.topY - 1 }, dir: Blueprint.RIGHT },
-            { pos: { x: this.gridSize / 2 - 1, y: tRail.bottomY + 2 }, dir: Blueprint.LEFT },
+            { pos: { x: tRail.guides.center, y: tRail.guides.top - 1 }, dir: Blueprint.RIGHT },
+            { pos: { x: tRail.guides.center, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
             // bottom 1/4 and 3/4
-            { pos: { x: this.gridSize / 4 - 1, y: tRail.bottomY + 2 }, dir: Blueprint.LEFT },
-            { pos: { x: this.gridSize / 4 * 3, y: tRail.bottomY + 2 }, dir: Blueprint.LEFT },
+            { pos: { x: tRail.guides.zero + 10, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
+            { pos: { x: tRail.guides.max - 11, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
             // above / below right curve
-            { pos: { x: this.gridSize / 4 * 3, y: tRail.topY + 3 }, dir: Blueprint.RIGHT - 1 },
-            { pos: { x: this.gridSize / 4 * 3, y: tRail.bottomY + 9 }, dir: Blueprint.LEFT + 1 },
+            { pos: { x: tRail.guides.max - 11, y: tRail.guides.center }, dir: Blueprint.RIGHT - 1 },
+            { pos: { x: tRail.guides.max - 10, y: tRail.guides.max - 8}, dir: Blueprint.LEFT - 1 },
             // above / below left curve
-            { pos: { x: this.gridSize / 4 - 1, y: tRail.topY + 3 }, dir: Blueprint.RIGHT + 1 },
-            { pos: { x: this.gridSize / 4 - 1, y: tRail.bottomY + 9 }, dir: Blueprint.LEFT + 1 },
-            // inside triangle curves
-            { pos: { x: this.gridSize / 2 - 4, y: tRail.bottomY + 4 }, dir: Blueprint.RIGHT + 1 },
-            { pos: { x: this.gridSize / 2 + 3, y: tRail.bottomY + 4 }, dir: Blueprint.RIGHT - 1 },
+            { pos: { x:  tRail.guides.zero + 10, y: tRail.guides.center }, dir: Blueprint.RIGHT + 1 },
+            { pos: { x: tRail.guides.zero + 9, y: tRail.guides.max - 8 }, dir: Blueprint.LEFT + 1 },
+            // inside triangle curves - only works above a certain size
+            { pos: { x: tRail.guides.zero + 17, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT + 1 },
+            { pos: { x: tRail.guides.max - 18, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT - 1 },
         ];
 
         signalPositions.forEach(s => {
@@ -92,9 +92,8 @@ export default class RailBook {
 
 
     generate() {
-        console.log(this);
-        //this.blueprints.forEach(bp => { bp.addLandfill() });
-        return Blueprint.toBook(this.blueprints);
+        console.log(this.blueprints);
+        return Blueprint.toBook(this.blueprints, 2, {autoConnectPoles: false});
         
     }
 }
@@ -159,19 +158,20 @@ class RailSection extends Blueprint {
     // entity offset is used for dealing with things like curved rail which have weird anchor points 
     static rotateCoordinate(pos, size, entityOffset = { w: 1, h: 1 }) {
         let newPos = {};
-        newPos.x = size / 2 + pos.y; // Calculate the new X coordinate
-        newPos.y = size / 2 - pos.x; // Calculate the new Y coordinate
+        newPos.x = pos.y ; // Calculate the new X coordinate
+        newPos.y = size - pos.x; // Calculate the new Y coordinate
         //from lower right quadrant
-        if (pos.x > size / 2 && pos.y > 0) {
+        if (pos.x > 0 && pos.y > 0) {
             newPos.y -= entityOffset.w;
             // from lower left quardrant
-        } else if (pos.x < size / 2 && pos.y > 0) {
+        } else if (pos.x < 0 && pos.y > 0) {
             newPos.y -= entityOffset.w;
             // upper left quadrant
-        } else if (pos.x < size / 2 && pos.y < 0) {
+        } else if (pos.x < 0 && pos.y < 0) {
             newPos.y -= entityOffset.w;
         }
         return newPos;
+        
 
     }
     static rotateDirection(dir, curve = false) {
@@ -271,64 +271,46 @@ class RailSection extends Blueprint {
 
         })
     }
-    createCurvedRail({ allowOverlap = true, rotate = false } = {}) {
+    createCurvedRail({ allowOverlap = true, rotate = false, offset = {x: 0, y: 0} } = {}) {
+        if (offset.x % 2 == 1  || offset.y %2 == 1) throw new Error("Offset cannot be odd");
+
         let rails = [
-            { ent: 'straight-rail', pos: { x: this.guides.zero + 2, y: this.guides.top }, dir: Blueprint.RIGHT, entityOffset: { w: 2, h: 2 } },
-            { ent: 'straight-rail', pos: { x: this.guides.right, y: this.guides.max - 4 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
-            { ent: 'curved-rail', pos: { x: this.guides.zero + 8, y: this.guides.top + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
-            { ent: 'curved-rail', pos: { x: this.guides.zero + 6, y: this.guides.bottom + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
-            { ent: 'curved-rail', pos: { x: this.guides.center - this.trackSpacing/2 + 2, y: this.guides.max - 6 }, dir: 0, entityOffset: { w: -2, h: 0 } },
-            { ent: 'curved-rail', pos: { x: this.guides.center + this.trackSpacing/2, y: this.guides.max - 8 }, dir: 0, entityOffset: { w: -2, h: 0 } },
+            // { ent: 'straight-rail', pos: { x: this.guides.zero + 2, y: this.guides.top }, dir: Blueprint.RIGHT, entityOffset: { w: 2, h: 2 } },
+            // { ent: 'straight-rail', pos: { x: this.guides.right, y: this.guides.max - 4 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
+            { ent: 'curved-rail', pos: { x: this.guides.zero + 6, y: this.guides.top + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: this.guides.zero + 4, y: this.guides.bottom + 2 }, dir: 3, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: this.guides.center - this.trackSpacing/2 + 2, y: this.guides.max - 4 }, dir: 0, entityOffset: { w: -2, h: 0 } },
+            { ent: 'curved-rail', pos: { x: this.guides.center + this.trackSpacing/2, y: this.guides.max - 6 }, dir: 0, entityOffset: { w: -2, h: 0 } },
         ];
 
 
         let runs = [
          { 
-            from: { x: this.guides.zero + 10, y: this.guides.top + 4 }, 
-            to: { x: this.guides.right - 4, y: this.guides.max - 12 } 
+            from: { x: this.guides.zero + 8, y: this.guides.top + 4 }, 
+            to: { x: this.guides.right - 4, y: this.guides.max - 10 } 
         },
-            { from: { x: this.guides.zero + 8, y: this.guides.bottom + 4 }, 
-            to: { x: this.guides.left - 4, y: this.guides.bottom + 12 } }
+            { from: { x: this.guides.zero + 6, y: this.guides.bottom + 4 }, 
+            to: { x: this.guides.left - 4, y: this.guides.max - 8 } }
         ]
-        // if (rotate) {
-        //     rails.map(r => {
-        //         r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset);
-        //         r.dir = RailSection.rotateDirection(r.dir);
-        //     })
-        //     runs.map(r => {
-        //         r.to = RailSection.rotateCoordinate(r.to, this.gridSize, { w: -2, h: -2 });
-        //         r.from = RailSection.rotateCoordinate(r.from, this.gridSize, { w: -2, h: -2 });
-        //     })
-        // }
+        if (rotate) {
+            rails.map(r => {
+                r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset);
+                r.dir = RailSection.rotateDirection(r.dir);
+            })
+            runs.map(r => {
+                r.to = RailSection.rotateCoordinate(r.to, this.gridSize, { w: 0, h: 0 });
+                r.from = RailSection.rotateCoordinate(r.from, this.gridSize, { w: 0, h: 0 });
+            })
+        }
 
         rails.forEach(r => {
-            this.createEntity(r.ent, r.pos, r.dir, allowOverlap);
+            let pos = {x: r.pos.x + offset.x, y: r.pos.y + offset.y }
+            this.createEntity(r.ent, pos, r.dir, allowOverlap);
         });
 
         runs.forEach(r => {
             this.runRail(r.from, r.to);
         })
-
-        // let polePosistions = [
-        //     { x: -1, y: -1 },
-        //     { x: this.leftX - 5, y: this.bottomY + 5 },
-        //     { x: this.gridSize / 2 - 1, y: this.gridSize / 2 - 1 }
-        // ];
-        // if (rotate) {
-        //     polePosistions.map(p => {
-        //         p = RailSection.rotateCoordinate(p, this.gridSize);
-        //     })
-        // }
-        // polePosistions.forEach(position => {
-        //     let pole;
-        //     try {
-        //         if (pole = this.createEntity('big-electric-pole', position, 0, true))
-        //             this.poles.push(pole);
-        //     } catch (e) {
-        //         console.log(e);
-        //         console.log(position);
-        //     }
-        // });
 
     }
 
@@ -382,10 +364,18 @@ class RailSection extends Blueprint {
         poles.sort((a, b) => a.position.x - b.position.x);
         connections.forEach(c =>{
             poles.forEach((p,i) => {
-                if (i == 0 ) return;
+                if (i == 0 ) {
+                    return;
+                }
                 p.connect(poles[i - 1], null, null, c);
+                p.neighbours.push(poles[i-1]);
+                if (i < poles.length - 1) {
+                    p.neighbours.push(poles[i+1]);
+                }
+                poles[i-1].neighbours.push(p);
             });
         });
+        console.log(poles);
     }
     runRail(from = { x: 0, y: 0 }, to = { x: this.gridSize, y: 0 }) {
         if (isNaN(from.x) || isNaN(to.x) || isNaN(from.y) || isNaN(to.y)) throw new Error(`Error: Non number given for position ${JSON.stringify(from)} ${JSON.stringify(to)}`);
