@@ -32,6 +32,22 @@
         link
         to="/SpaceSushi/rails"
       />
+      <v-list-item
+        prepend-icon="mdi-cancel"
+        title="Clear Storage"
+        value="clear"
+        @click="clearData()"
+      />
+
     </v-list>
   </v-navigation-drawer>
 </template>
+<script>
+export default {
+  methods: {
+    clearData() {
+      localStorage.removeItem('app');
+    }
+  }
+}
+</script>

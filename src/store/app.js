@@ -25,9 +25,13 @@ items.forEach(i => {
 
 export const useAppStore = defineStore('app', {
   state: () => {
-    if (localStorage.getItem("app"))
-      return JSON.parse(localStorage.getItem("app"));
+    // if (localStorage.getItem("app"))
+    //   return JSON.parse(localStorage.getItem("app"));
     return {
+      railSettings: {
+        gridSize: 48,
+        trackSpacing: 6
+      },
       items: namedItems,
       recipes: namedRecipes,
       icons: namedIcons,

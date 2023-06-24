@@ -3,10 +3,10 @@ import { Exception } from 'sass';
 //import seData from './assets/data.json';
 
 export default class RailBook {
-    constructor() {
+    constructor({gridSize=48}={}) {
         // ** These things should be customizable //
         this.trackSpacing = 8; // The distance between track centers aka two more than the open spaces
-        this.gridSize = 48; // How big are the grid snaps, defaults to one chunk
+        this.gridSize = gridSize; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
 
         // ***** //
