@@ -46,6 +46,9 @@ describe("Tracks", () => {
             let tracks = bp.toObject().blueprint.entities.filter(e => (trackNames.includes(e.name)));
             expect(tracks.length).not.toBe(0);
             tracks.forEach(e => {
+                if ((e.position.x % 2) || (e.position.y % 2)) {
+                    console.log(bp.name);
+                    console.log(e);}
                 expect(e.position.x % 2).toBe(0);
                 expect(e.position.y % 2).toBe(0);
             });

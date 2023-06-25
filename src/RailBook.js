@@ -114,8 +114,8 @@ class RailSection extends Blueprint {
         // track spacing that isn't divisible by 4 causes problems with grid alignment, this is an attempt to combat that
         this.globalOffset = this.hasEvenSpacing() ? 0 : 1;
 
-        this.guides = { zero: 0.5, max: this.gridSize + 0.5 };
-        this.guides.center = this.gridSize / 2 - this.guides.zero;
+        this.guides = { zero: 0.5 - this.globalOffset, max: this.gridSize + 0.5 - this.globalOffset };
+        this.guides.center = this.gridSize / 2 - this.guides.zero - this.globalOffset;
         this.guides.top = this.guides.center - this.trackSpacing / 2;
 
         this.guides.bottom = this.guides.top + this.trackSpacing;
@@ -290,10 +290,10 @@ class RailSection extends Blueprint {
         let rails = [
             // { ent: 'straight-rail', pos: { x: this.guides.zero + 2, y: this.guides.top }, dir: Blueprint.RIGHT, entityOffset: { w: 2, h: 2 } },
             // { ent: 'straight-rail', pos: { x: this.guides.right, y: this.guides.max - 4 }, dir: Blueprint.UP, entityOffset: { w: 2, h: 2 } },
-           { ent: 'curved-rail', pos: { x: 7, y: this.guides.top - this.guides.zero + 3  }, dir: 3, entityOffset: { w: -2, h: 0 } },
-           { ent: 'curved-rail', pos: { x: 5, y: this.guides.bottom - this.guides.zero + 3  }, dir: 3, entityOffset: { w: -2, h: 0 } },
-           { ent: 'curved-rail', pos: { x: this.guides.center + 1 -this.trackSpacing / 2 - this.guides.zero, y: this.guides.max - 3 - this.guides.zero }, dir: 0, entityOffset: { w: -2, h: 0 } },
-           { ent: 'curved-rail', pos: { x: this.guides.center + 1 + this.trackSpacing / 2 - this.guides.zero, y: this.guides.max - 5 - this.guides.zero}, dir: 0, entityOffset: { w: -2, h: 0 } },
+           { ent: 'curved-rail', pos: { x: 7 + this.globalOffset, y: this.guides.top - this.guides.zero + 3 + this.globalOffset  }, dir: 3, entityOffset: { w: -2, h: 0 } },
+           { ent: 'curved-rail', pos: { x: 5+ this.globalOffset, y: this.guides.bottom - this.guides.zero + 3 + this.globalOffset }, dir: 3, entityOffset: { w: -2, h: 0 } },
+           { ent: 'curved-rail', pos: { x: this.guides.center + 1 -this.trackSpacing / 2 - this.guides.zero+ this.globalOffset, y: this.guides.max+ this.globalOffset - 3 - this.guides.zero }, dir: 0, entityOffset: { w: -2, h: 0 } },
+           { ent: 'curved-rail', pos: { x: this.guides.center + 1 + this.trackSpacing / 2 - this.guides.zero+ this.globalOffset, y: this.guides.max+ this.globalOffset - 5 - this.guides.zero}, dir: 0, entityOffset: { w: -2, h: 0 } },
 
         ];
         if (power) {
