@@ -16,8 +16,10 @@
           Copy
         </v-btn>
         {{ blueprintString }}
+
       </v-card-text>
     </v-card>
+    {{ straightJSON }}
   </v-container>
 </template>
   <script>
@@ -34,13 +36,13 @@ export default {
   data: () => ({
     gridSize: 48,// railSettings.gridSize,
     trackSpacing: 8, //railSettings.trackSpacing,
-    blueprintString: '',    
+    blueprintString: '', 
+    straightJSON: ''   
   }),
   methods: {
     generate() {
       let opts = {gridSize: this.gridSize, trackSpacing: this.trackSpacing};
-      console.log(opts);
-      this.blueprintString = new RailBook(opts).generate();
+      [this.blueprintString, this.straightJSON] = new RailBook(opts).generate();
     },
     async copyCode() {
       await navigator.clipboard.writeText(this.blueprintString);
