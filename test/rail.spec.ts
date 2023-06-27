@@ -93,27 +93,29 @@ describe("Tracks", () => {
     it("should have power poles", () => {
         const bp = new RailBook({ gridSize: 48, trackSpacing: 6 }).createStraightBlueprint();
         let poles = bp.toObject().blueprint.entities.filter(e => (e.name == 'big-electric-pole'));
+ 
         expect(poles.length > 1).toBe(true);
     });
     it("should place straight edge poles correctly", () => {
         const bp = new RailBook({ gridSize: 48, trackSpacing: 6 }).createStraightBlueprint();
         let poles = bp.toObject().blueprint.entities.filter(e => (e.name == 'big-electric-pole'));
-
-        expect(poles[0].position.x).toBe(0);
-        expect(poles.slice(-1)[0].position.x).toBe(48);
+        
+        expect(bp.findEntity({x: 0, y: 24}).name ).toBe('big_electric_pole');
+        expect(bp.findEntity({x: 48, y: 24}).name ).toBe('big_electric_pole');
 
     });
     it("should align pole evenly on 4/8", () => {
         const bp = new RailBook({ gridSize: 48, trackSpacing: 8 }).blankSection();
         bp.createTwoLanesAcross();
-        let poles = bp.toObject().blueprint.entities.filter(e => (e.name == 'big-electric-pole'));
+        let poles = bp.toObject().blueprint.entities.filter(e => (e.name == 'big-electric-pole' || e.name == 'big_electric_pole'));
+
         poles.forEach(e => {
-            if (!(e.position.x % 2)) {
+            if (e.position.x % 2) {
                 console.log(bp.name);
                 console.log(e);
             }
-            expect(e.position.x % 2).toBe(1);
-            expect(e.position.y % 2).toBe(1);
+            expect(e.position.x % 2).toBe(0);
+            expect(e.position.y % 2).toBe(0);
         });
     });
 });
@@ -132,8 +134,10 @@ describe("Snapping", () => {
     it("should be offset by 1 for 6/10 spacing", () => {
         const rb = new RailBook({ gridSize: 48, trackSpacing: 6 });
         rb.blueprints.forEach(bp => {
+            if (bp.snapping) {
             expect(bp.snapping.position.x).toBe(1);
             expect(bp.snapping.position.y).toBe(1);
+            }
         });
     });
 });

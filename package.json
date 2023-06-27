@@ -11,7 +11,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@kellbot/factorio-blueprint": "^2.6.6",
+    "@kellbot/factorio-blueprint": "^2.6.7",
     "@mdi/font": "7.0.96",
     "core-js": "^3.29.0",
     "pinia": "^2.0.0",

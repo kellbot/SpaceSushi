@@ -1,6 +1,6 @@
 import Blueprint from '@kellbot/factorio-blueprint';
 import RailSection from './RailSection.js';
-import { Exception } from 'sass';
+import Station from './Station.js';
 //import seData from './assets/data.json';
 
 export default class RailBook {
@@ -15,17 +15,21 @@ export default class RailBook {
         this.blueprints =
             [
                 // Straight rails
-                this.createStraightBlueprint({ label: `Straight Track [${this.gridSize} - ${this.trackSpacing}]` }), // Basic straight rail
-                this.createCornerBlueprint(),
-                this.createIntersectionT(),
-                // this.createCurveTest(),
-
-            ];
+                this.createStraightBlueprint({ label: `Straight Track [${this.gridSize} - ${this.trackSpacing-2}]` }), // Basic straight rail
+                // this.createCornerBlueprint(),
+                // this.createIntersectionT(),
+                // this.createIntersectionX(),
+               ]//.concat(this.createStations());
     }
 
     blankSection() {
         let section = new RailSection(this);
         return section;
+    }
+
+
+    createStations() {
+        return [Station.loader(this), Station.unloader(this)];
     }
 
     createCurveTest() {
@@ -38,38 +42,48 @@ export default class RailBook {
 
     }
 
-    createStraightBlueprint({ label = 'Straight Rail', connections = ["red", "green"] } = {}) {
+    createStraightBlueprint({ label = 'Straight Rail'} = {}) {
         let straightRail = new RailSection(this);
         straightRail.name = label;
         straightRail.description = "A straight section of track";
-        straightRail.createTwoLanesAcross();
-        straightRail.createPowerAcross();
         straightRail.addRailConnections({left: true, right: true});
+        straightRail.createTwoLanesAcross();
         straightRail.setSnapping();
-        straightRail.autoConnectPoles();
         return straightRail;
     }
 
     createCornerBlueprint() {
         let cornerRail = new RailSection(this);
         cornerRail.name = "Curved Track";
-        cornerRail.createCurvedRail();
         cornerRail.addRailConnections({ left: true, bottom: true }, true, true);
-
+        cornerRail.createCurvedRail();
         cornerRail.setSnapping();
-        cornerRail.autoConnectPoles();
         return cornerRail;
+    }
+
+    createIntersectionX() {
+        let xRail = new RailSection(this);
+        xRail.name = "4 way intersection";
+
+        xRail.addRailConnections({ left: true, bottom: true, right: true, top: true }, true, true);
+        xRail.createTwoLanesAcross();
+        xRail.createTwoLanesDown();
+        xRail.createCurvedRail({signals: true, poles: true});
+        xRail.createCurvedRail({rotations: 1, signals: true});
+        xRail.createCurvedRail({rotations: 2, signals: true});
+        xRail.createCurvedRail({rotations: 3, signals: true});
+
+        xRail.setSnapping();
+        return xRail;
     }
 
     createIntersectionT() {
         let tRail = new RailSection(this);
         tRail.name = "T Intersection";
-        tRail.createTwoLanesAcross()
         tRail.addRailConnections({ left: true, bottom: true, right: true }, true, true);
-
-        tRail.createPowerAcross();
-        tRail.createCurvedRail({ power: true });
-        tRail.createCurvedRail({ power: true, rotate: true });
+        tRail.createTwoLanesAcross()
+        tRail.createCurvedRail();
+        tRail.createCurvedRail({ power: true, rotations: 1 });
         //Signal direction points to rail
         let signalPositions = [
             // top and bottom middle
@@ -104,11 +118,11 @@ export default class RailBook {
 
 
     generate() {
-        this.blueprints.forEach(bp => {
-            console.log(bp);
-            console.log(bp.toObject())
-        });
-        return [Blueprint.toBook(this.blueprints, 2, { autoConnectPoles: true }), this.blueprints[2].toJSON()];
+        // this.blueprints.forEach(bp => {
+        //     console.log(bp);
+        //     console.log(bp.toObject())
+        // });
+        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }), this.blueprints[0].toJSON()];
 
     }
 }
