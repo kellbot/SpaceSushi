@@ -16,10 +16,10 @@ export default class RailBook {
             [
                 // Straight rails
                 this.createStraightBlueprint({ label: `Straight Track [${this.gridSize} - ${this.trackSpacing-2}]` }), // Basic straight rail
-                // this.createCornerBlueprint(),
-                // this.createIntersectionT(),
-                // this.createIntersectionX(),
-               ]//.concat(this.createStations());
+                this.createCornerBlueprint(),
+                this.createIntersectionT(),
+                this.createIntersectionX(),
+               ].concat(this.createStations());
     }
 
     blankSection() {

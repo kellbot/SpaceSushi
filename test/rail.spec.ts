@@ -78,6 +78,7 @@ describe("Tracks", () => {
     it("should only place tracks on even numbers when snapped by 1", () => {
         const rb = new RailBook({ gridSize: 48, trackSpacing: 6 });
         rb.blueprints.forEach(bp => {
+            if (!bp.snapping) return;
             let tracks = bp.toObject().blueprint.entities.filter(e => (trackNames.includes(e.name)));
             expect(tracks.length).not.toBe(0);
             tracks.forEach(e => {

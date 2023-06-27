@@ -23,7 +23,7 @@ export default class Station extends RailSection {
         this.doubleSided = true;
         this.engineLength = this.doubleSided ? this.engineCount * 2 * 7 : this.engineCount * 7;
         this.start = { x: this.guides.zero + this.engineCount * 7 + 1, y: this.guides.top - 2 };
-        this.end = { x: this.guides.zero + this.engineLength + this.trainLength * 7 - 2, y: this.guides.top - 11};
+        this.end = { x: this.guides.zero + this.engineLength + this.trainLength * 7 - 2, y: this.guides.top - 10};
 
         this.placeTrack();
     }
@@ -91,12 +91,21 @@ export default class Station extends RailSection {
     static basic(parent, includeStop = true) {
         let station = new Station(parent);
         let entities = [
-            {name: 'curved-rail', position: {x: station.end.x + 11, y: station.end.y + 7}, direction: 5}
+            {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center - 10.5 + station.globalOffset}, direction: 5},
+            {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center + 3.5 + station.globalOffset}, direction: 0},
+            {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 4.5 + station.globalOffset}, direction: 2},
+            {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 2.5 + station.globalOffset}, direction: 3},
+            {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 9 + station.globalOffset}, direction: 3},
+             {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 1 + station.globalOffset}, direction: 1},
+            
         ]
-        // entities.forEach(entity => {
-        //     station.createEntity(entity.name, entity.position, entity.direction);
-        // })
-        // if (includeStop) station.createEntity('train_stop', { x: station.guides.zero, y: station.guides.top - 2 }, Blueprint.LEFT);
+        entities.forEach(entity => {
+            station.createEntity(entity.name, entity.position, entity.direction);
+        })
+        station.runRail(
+            {x: station.end.x +  station.globalOffset + 12, y: station.guides.center +  station.globalOffset - 14}, 
+            {x: station.end.x +  station.globalOffset + 12, y: station.guides.center +  station.globalOffset + 2})
+        if (includeStop) station.createEntity('train_stop', { x: station.guides.zero, y: station.guides.top - 2 }, Blueprint.LEFT);
         return station;
     }
 

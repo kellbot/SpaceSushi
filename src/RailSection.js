@@ -324,17 +324,21 @@ export default class RailSection extends Blueprint {
 
         if (isNaN(from.x) || isNaN(to.x) || isNaN(from.y) || isNaN(to.y)) throw new Error(`Error: Non number given for position ${JSON.stringify(from)} ${JSON.stringify(to)}`);
 
-        let direction;
+        let direction, target;
         if (from == to) return false
         // Determine direction
         if (from.x == to.x) {
+            target = Math.abs(to.y - from.y);
             direction = (from.y > to.y) ? Blueprint.DOWN : Blueprint.UP;
         } else if (from.y == to.y) {
+            target = Math.abs(to.x - from.x);
             direction = (from.x > to.x) ? Blueprint.RIGHT : Blueprint.RIGHT;
         } else if (from.x > to.x) {
+            target = Math.abs(to.x - from.x);
             direction = (from.y > to.y) ? 5 : 3;
             to.x = to.x - 2;
         } else {
+            target = Math.abs(to.x - from.x);
             direction = (from.y > to.y) ? 7 : 1;
         }
         if (direction != Blueprint.UP && direction != Blueprint.DOWN);
@@ -343,7 +347,7 @@ export default class RailSection extends Blueprint {
         let yJump = from.y > to.y ? -1 : 1;
 
 
-        let target = Math.abs(to.x - from.x);
+        
         let x, y, s;
         for (let j = 0; j <= target; j += 2) {
 
@@ -374,14 +378,14 @@ export default class RailSection extends Blueprint {
             if (from.y == to.y) {
                 this.createEntity('straight-rail', { x: from.x + j * xJump, y: from.y }, direction, true);
                 //diagonal
-            } else {
+            } else if (from.x == to.x){
+                this.createEntity('straight-rail', { x: from.x, y: from.y +  j * yJump }, direction, true);
+            }else {
                 this.createEntity('straight-rail', { x: x, y: y }, direction, true);
                 if (j + 1 <= target) this.createEntity('straight-rail', { x: x + s.x, y: y + s.y }, RailSection.flip(direction), true);
             }
         }
     }
-
-
 }
 
 
