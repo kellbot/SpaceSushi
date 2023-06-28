@@ -38,5 +38,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    fs: {
+      allow: [
+        '..',
+        'D:/repos/factorio-blueprint/dist/factorio-blueprint.min.js'
+      ]
+    }
   },
 })

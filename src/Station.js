@@ -91,22 +91,34 @@ export default class Station extends RailSection {
     static basic(parent, includeStop = true) {
         let station = new Station(parent);
         let entities = [
-            {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center - 10.5 + station.globalOffset}, direction: 5},
+            // top right curve
+            {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center - 10.5 + station.globalOffset}, direction: 5},        
+            // bottom right curve
             {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center + 3.5 + station.globalOffset}, direction: 0},
+            // top left curve
             {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 4.5 + station.globalOffset}, direction: 2},
+            //bottom left curve
             {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 2.5 + station.globalOffset}, direction: 3},
+            
             {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 9 + station.globalOffset}, direction: 3},
-         {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 1 + station.globalOffset}, direction: 1},
+            {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top - 4.5 + station.globalOffset}, direction: 1},
+            {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top - 2.5 + station.globalOffset}, direction: 5},
+
+           {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 1 + station.globalOffset}, direction: 1},
+           {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top + 4.5 + station.globalOffset}, direction: 7},
+           {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top + 2.5 + station.globalOffset}, direction: 3},
+         
+           //straight track signals
             {name: 'rail-chain-signal', position: {x: station.end.x +10.5 + station.globalOffset, y: station.guides.center + station.globalOffset - 14 }, direction: Blueprint.UP},
             {name: 'rail-chain-signal', position: {x: station.end.x +13.5 + station.globalOffset, y: station.guides.center + station.globalOffset - 14 }, direction: Blueprint.DOWN},
 
         ]
         entities.forEach(entity => {
-            station.createEntity(entity.name, entity.position, entity.direction);
+            station.createEntity(entity.name, entity.position, entity.direction, true);
         })
         station.runRail(
             {x: station.end.x +  station.globalOffset + 12, y: station.guides.center +  station.globalOffset - 15}, 
-            {x: station.end.x +  station.globalOffset + 12, y: station.guides.center +  station.globalOffset + 3})
+            {x: station.end.x +  station.globalOffset + 12, y: station.guides.top +  station.globalOffset + 11})
         if (includeStop) station.createEntity('train_stop', { x: station.guides.zero, y: station.guides.top - 2 }, Blueprint.LEFT);
         return station;
     }

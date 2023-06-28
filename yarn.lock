@@ -68,10 +68,9 @@
   resolved "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz"
   integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
 
-"@kellbot/factorio-blueprint@^2.6.7":
+"@kellbot/factorio-blueprint@github:kellbot/factorio-blueprint#trimmedoutput":
   version "2.6.7"
-  resolved "https://registry.npmjs.org/@kellbot/factorio-blueprint/-/factorio-blueprint-2.6.7.tgz"
-  integrity sha512-tJKRZXksC7IbYosa781uHCu1g054vG6qXHjdDPYK6fKJp2vnaj4iYPnPlzSgTuWCTQq1aDxyMqhtPvj+gWcyuA==
+  resolved "git+ssh://git@github.com/kellbot/factorio-blueprint.git#4f7777ff066860008db7a111d20b65bcd2982109"
 
 "@mdi/font@7.0.96":
   version "7.0.96"

@@ -1,5 +1,4 @@
 import Blueprint from '@kellbot/factorio-blueprint';
-import { Exception } from 'sass';
 
 export default class RailSection extends Blueprint {
     constructor(parent) {
@@ -71,10 +70,14 @@ export default class RailSection extends Blueprint {
             newPos.y -= entityOffset.w;
             // from lower left quardrant
         } else if (pos.x < 0 && pos.y > 0) {
-            newPos.y -= entityOffset.w;
+            newPos.y -= entityOffset.h;
             // upper left quadrant
         } else if (pos.x < 0 && pos.y < 0) {
+            newPos.x -= entityOffset.w;
+            // upper right quadrant
+        } else {
             newPos.y -= entityOffset.w;
+            newPos.x -= entityOffset.h;
         }
         if (iterations > 1) newPos = this.rotateCoordinate(newPos, size, entityOffset, iterations - 1);
 
@@ -213,14 +216,15 @@ export default class RailSection extends Blueprint {
             }
         ]
         if (rotations > 0) {
+            console.log(`rotations: ${rotations}`);
             rails.map(r => {
                 r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset, rotations);
                 r.dir = RailSection.rotateDirection(r.dir, rotations);
-            })
+            });
             runs.map(r => {
                 r.to = RailSection.rotateCoordinate(r.to, this.gridSize, { w: -1, h: -1 }, rotations);
                 r.from = RailSection.rotateCoordinate(r.from, this.gridSize, { w: -1, h: -1 }, rotations);
-            })
+            });
         }
 
         rails.forEach(r => {
@@ -341,7 +345,7 @@ export default class RailSection extends Blueprint {
             target = Math.abs(to.x - from.x);
             direction = (from.y > to.y) ? 7 : 1;
         }
-        if (direction != Blueprint.UP && direction != Blueprint.DOWN);
+        //if (direction != Blueprint.UP && direction != Blueprint.DOWN);
 
         let xJump = from.x > to.x ? -1 : 1;
         let yJump = from.y > to.y ? -1 : 1;
@@ -350,28 +354,29 @@ export default class RailSection extends Blueprint {
         
         let x, y, s;
         for (let j = 0; j <= target; j += 2) {
-
             switch (direction) {
                 case 7:
                     x = from.x + j * xJump;
                     y = from.y + yJump * j - 2;
                     s = { x: 0, y: -2 };
                     break;
-                case 5:
-                    x = from.x + j * xJump;
-                    y = from.y + yJump * j;
-                    s = { x: -2, y: 0 };
+                case 5://bottom left to top right
+                    x = from.x + j * xJump -2;
+                    y = from.y + yJump * j -2;
+                    s = { x:-2, y: 0 };
                     break;
-                case 3:
+                case 3: // top left to bottom right
                     x = from.x + j * xJump - 2;
                     y = from.y + yJump * j;
-                    s = { x: 2, y: 0 };
+                    s = { x: 0, y: 2 };
                     break;
-                default:
+                default: //top right to bottom left
                     x = from.x + j * xJump
                     y = from.y + yJump * j;
                     s = { x: 2, y: 0 };
             }
+
+         
 
 
             // straight across
@@ -382,7 +387,9 @@ export default class RailSection extends Blueprint {
                 this.createEntity('straight-rail', { x: from.x, y: from.y +  j * yJump }, direction, true);
             }else {
                 this.createEntity('straight-rail', { x: x, y: y }, direction, true);
-                if (j + 1 <= target) this.createEntity('straight-rail', { x: x + s.x, y: y + s.y }, RailSection.flip(direction), true);
+                if (j + 1 <= target)
+                     this.createEntity('straight-rail', { x: x + s.x, y: y + s.y }, RailSection.flip(direction), true);
+             
             }
         }
     }

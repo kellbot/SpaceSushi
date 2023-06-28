@@ -124,11 +124,11 @@ export default class RailBook {
 
 
     generate() {
-        // this.blueprints.forEach(bp => {
-        //     console.log(bp);
-        //     console.log(bp.toObject())
-        // });
-        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }), this.blueprints[0].toJSON()];
+        this.blueprints.forEach(bp => {
+            console.log(bp);
+            console.log(bp.toObject())
+        });
+        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing}]`, icons: ['rail', `signal_${this.trackSpacing-2}`]}), this.blueprints[0].toJSON()];
 
     }
 }
