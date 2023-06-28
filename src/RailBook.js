@@ -1,7 +1,6 @@
 import Blueprint from '@kellbot/factorio-blueprint';
 import RailSection from './RailSection.js';
 import Station from './Station.js';
-//import seData from './assets/data.json';
 
 export default class RailBook {
     constructor({ gridSize = 48, trackSpacing = 8 } = {}) {
@@ -109,8 +108,15 @@ export default class RailBook {
         // inside triangle curves - only works above a certain size
         if (this.gridSize > 36) {
             signalPositions = signalPositions.concat([
-                { pos: { x: tRail.guides.center + 3, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT + 1 },
-                { pos: { x: tRail.guides.center - 2, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT - 1 }
+                { pos: { x: tRail.guides.center + 3 + (10- this.trackSpacing) + tRail.globalOffset, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT - 1 },
+                { pos: { x: tRail.guides.center - 2 - (10- this.trackSpacing) - tRail.globalOffset, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT + 1 }
+            ]);
+        }
+
+        if (this.trackSpacing > 6) {
+            signalPositions = signalPositions.concat([
+                { pos: { x: tRail.guides.left + 2, y: tRail.guides.max -10 }, dir: Blueprint.RIGHT - 1 },
+                { pos: { x: tRail.guides.right - 1, y: tRail.guides.max -10  }, dir: Blueprint.RIGHT + 1 }
             ]);
         }
 
@@ -128,7 +134,7 @@ export default class RailBook {
             console.log(bp);
             console.log(bp.toObject())
         });
-        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing}]`, icons: ['rail', `signal_${this.trackSpacing-2}`]}), this.blueprints[0].toJSON()];
+        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing-2}]`, icons: ['rail', `signal_${this.trackSpacing-2}`]}), this.blueprints[0].toJSON()];
 
     }
 }

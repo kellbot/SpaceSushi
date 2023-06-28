@@ -32,7 +32,7 @@
     "frozen_snow_0": {
         "type": "tile"
     },
-    "signal_4" {
+    "signal_4" : {
         "type": "icon"
     }
 }
