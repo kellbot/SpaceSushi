@@ -116,34 +116,37 @@ export default class RailSection extends Blueprint {
                 let offset = { x: 0, y: 0 };
                 switch (e.direction) {
                     case 0:
-                        offset = { x: -3, y: -4 };
+                       offset = { x: -4, y: -5 };
                         break;
-                    case 1: offset = { x: -2, y: -4 };
+                    case 1:
+                        offset = { x: -3, y: -5 };
                         landfillShape = flipMatrix(landfillShape);
                         break;
                     case 2:
                         landfillShape = rotateMatrix90C(landfillShape);
-                        offset = { x: -4, y: -3 };
+                        offset = { x: -5, y: -4 };
                         break;
-                    case 3: offset = { x: -4, y: -2 };
+                    case 3: offset = { x: -5, y: -3 };
                         landfillShape = flipMatrix(landfillShape);
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
                     case 4:
-                        offset = { x: -2, y: -4 };
+                        offset = { x: -3, y: -5 };
                         landfillShape = rotateMatrix90C(landfillShape);
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
-                    case 5: offset = { x: -3, y: -4 };
+                    case 5: 
+                    offset = { x: -4, y: -5 };
                         landfillShape = flipMatrix(landfillShape, "vertical");
                         break;
                     case 6:
-                        offset = { x: -4, y: -2 };
+                        offset = { x: -5, y: -3 };
                         landfillShape = rotateMatrix90C(landfillShape);
                         landfillShape = rotateMatrix90C(landfillShape);
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
-                    case 7: offset = { x: -4, y: -3 };
+                    case 7: 
+                    offset = { x: -5, y: -4 };
                         landfillShape = flipMatrix(landfillShape, "vertical");
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
@@ -152,11 +155,7 @@ export default class RailSection extends Blueprint {
                 landfillShape.forEach((data, row) => {
                     data.forEach((hasLandfill, col) => {
                         if (hasLandfill) {
-                            let nudge = { x: 0, y: 0 };
-
-                            // if (e.position.y > 0 && e.position.x > this.gridSize/2) nudge.y += 0.5;
-                            //if (e.position.x < 24) nudge.x -= 0.5;
-                            this.createTile('landfill', { x: e.position.x + col + offset.x + nudge.x, y: e.position.y + row + offset.y + nudge.y });
+                            this.createTile('landfill', { x: e.position.x + col + offset.x, y: e.position.y + row + offset.y });
                         }
                     });
                 })
@@ -167,13 +166,8 @@ export default class RailSection extends Blueprint {
                         if (e.diretion % 2 == 0) {
                             this.createTile('landfill', { x: e.position.x + x, y: e.position.y + y });
                         } else {
-                            let offset = { x: 0, y: 0 };
-                            if (e.direction == 7 || e.direction == 3) {
-                                offset.y = e.position.y < 0 ? 0 : -1;
-                            } else if (e.direction == 1 || e.direction == 5) {
-                                offset.x = e.position.y > 0 ? -1 : 0;
-                            }
-                            this.createTile('landfill', { x: e.position.x + x + offset.x, y: e.position.y + y + offset.y });
+
+                            this.createTile('landfill', { x: e.position.x + x, y: e.position.y + y });
                         }
                     }
                 }

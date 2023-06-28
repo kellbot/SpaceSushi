@@ -70,8 +70,8 @@ describe("Tracks", () => {
                     console.log(bp.name);
                     console.log(e);
                 }
-                expect(e.position.x % 2).toBe(1);
-                expect(e.position.y % 2).toBe(1);
+                expect(Math.abs(e.position.x % 2)).toBe(1);
+                expect(Math.abs(e.position.y % 2)).toBe(1);
             });
         });
     });

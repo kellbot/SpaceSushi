@@ -18,6 +18,7 @@ export default class RailBook {
                 this.createCornerBlueprint(),
                 this.createIntersectionT(),
                 this.createIntersectionX(),
+                this.createCurveTest(),
                ].concat(this.createStations());
     }
 
@@ -40,7 +41,7 @@ export default class RailBook {
     createCurveTest() {
         let test = new RailSection(this);
         for (let i = 0; i < 8; i++) {
-            test.createEntity('curved-rail', { x: 8 * i, y: -20 }, i);
+            test.createEntity('curved-rail', { x: 8 * i + 1 + test.globalOffset, y: -21 + test.globalOffset }, i);
 
         }
         return test;
@@ -133,6 +134,7 @@ export default class RailBook {
         this.blueprints.forEach(bp => {
             console.log(bp);
             console.log(bp.toObject())
+            bp.addLandfill();
         });
         return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing-2}]`, icons: ['rail', `signal_${this.trackSpacing-2}`]}), this.blueprints[0].toJSON()];
 
