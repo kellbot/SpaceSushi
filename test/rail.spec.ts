@@ -113,8 +113,7 @@ describe("Tracks", () => {
         poles.forEach(e => {
             if (e.position.x % 2) {
                 console.log(bp.name);
-                console.log(e);
-            }
+                console.log(e);}
             expect(e.position.x % 2).toBe(0);
             expect(e.position.y % 2).toBe(0);
         });
