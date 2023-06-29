@@ -31,16 +31,14 @@ export default class RailSection extends Blueprint {
             this.createEntity('straight_rail', { x: i, y: this.guides.bottom }, Blueprint.LEFT, true);
         }
         let poleCount = Math.ceil(this.gridSize / 30) + 1;
-        if (poleCount > 3) {
-            throw new Error("Sorry I can't count above 3, use smaller blocks.");
-        }
+
         let poleDistance = this.gridSize / (poleCount - 1);
 
         let poles = [];
         for (let i = this.guides.zero - 1; i < this.gridSize; i += poleDistance) {
-            if(i < 2) continue;
-            if (i > this.gridSize -2 ) continue;
-            let position = { x: i +  + this.globalOffset, y: this.guides.center  };
+            if (i < 2) continue;
+            if (i > this.gridSize - 2) continue;
+            let position = { x: i + + this.globalOffset, y: this.guides.center };
             poles.push(this.createEntity('big-electric-pole', position, 0, false));
 
         }
@@ -116,7 +114,7 @@ export default class RailSection extends Blueprint {
                 let offset = { x: 0, y: 0 };
                 switch (e.direction) {
                     case 0:
-                       offset = { x: -4, y: -5 };
+                        offset = { x: -4, y: -5 };
                         break;
                     case 1:
                         offset = { x: -3, y: -5 };
@@ -135,8 +133,8 @@ export default class RailSection extends Blueprint {
                         landfillShape = rotateMatrix90C(landfillShape);
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
-                    case 5: 
-                    offset = { x: -4, y: -5 };
+                    case 5:
+                        offset = { x: -4, y: -5 };
                         landfillShape = flipMatrix(landfillShape, "vertical");
                         break;
                     case 6:
@@ -145,8 +143,8 @@ export default class RailSection extends Blueprint {
                         landfillShape = rotateMatrix90C(landfillShape);
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
-                    case 7: 
-                    offset = { x: -5, y: -4 };
+                    case 7:
+                        offset = { x: -5, y: -4 };
                         landfillShape = flipMatrix(landfillShape, "vertical");
                         landfillShape = rotateMatrix90C(landfillShape);
                         break;
@@ -190,15 +188,17 @@ export default class RailSection extends Blueprint {
                 }, dir: 0, entityOffset: { w: -2, h: -2 }
             },
             { ent: 'curved-rail', pos: { x: this.guides.center + 1 + this.trackSpacing / 2 - this.guides.zero - this.globalOffset, y: this.guides.max - this.globalOffset - 5 - this.guides.zero }, dir: 0, entityOffset: { w: -2, h: -2 } },
-
         ];
         if (poles) {
+            let poleCoordinate = {
+                x: this.guides.zero + this.gridSize / 4 + (this.trackSpacing - 2) / 4,
+                y: this.guides.max - this.gridSize / 4 - (this.trackSpacing - 2) / 4,
+
+            }
             rails.push(
-                { ent: 'big-electric-pole', pos: { x: this.gridSize / 3 - this.guides.zero - 1, y: this.gridSize / 3 * 2 - this.guides.zero + 1 }, dir: 0, entityOffset: { w: 0, h: 0 } }
+                { ent: 'big-electric-pole', pos: poleCoordinate, dir: 0, entityOffset: { w: 1, h: 1 } }
             );
         }
-
-
         let runs = [
             {
                 from: { x: this.guides.zero + 8, y: this.guides.top + 4 },
@@ -210,7 +210,6 @@ export default class RailSection extends Blueprint {
             }
         ]
         if (rotations > 0) {
-            console.log(`rotations: ${rotations}`);
             rails.map(r => {
                 r.pos = RailSection.rotateCoordinate(r.pos, this.gridSize, r.entityOffset, rotations);
                 r.dir = RailSection.rotateDirection(r.dir, rotations);
@@ -222,7 +221,6 @@ export default class RailSection extends Blueprint {
         }
 
         rails.forEach(r => {
-
             let newEnt = this.createEntity(r.ent, r.pos, r.dir, allowOverlap);
             if (r.ent == 'big-electric-pole') {
                 newPoles.push(newEnt);
@@ -302,19 +300,22 @@ export default class RailSection extends Blueprint {
     }
 
     connectPower(poles, connections = ["red", "green"]) {
-        poles.sort((a, b) => a.position.x - b.position.x);
+        //poles.sort((a, b) => a.position.x - b.position.x);
         connections.forEach(c => {
-            poles.forEach((p, i) => {
-                if (i == 0) {
-                    return;
-                }
-                p.connect(poles[i - 1], null, null, c);
-                p.neighbours.push(poles[i - 1]);
-                
-                poles[i - 1].neighbours.push(p);
-                if (i < poles.length - 1) {
-                    p.neighbours.push(poles[i + 1]);
-                }
+            poles.forEach((pole, i) => {
+                poles.forEach((otherPole) => {
+                    if (pole.position == otherPole.position) return; // it's the same pole
+                    if (calculateDistance(pole.position, otherPole.position) > 30) return; // too far away
+                    if (this.poles.includes(pole) && this.poles.includes(otherPole)) return; // don't connect edges to each other
+                    pole.connect(otherPole, null, null, c);
+                    if (!pole.neighbours.filter(n => (n.id == otherPole.id)).length)
+                        pole.neighbours.push(otherPole);
+
+                    if (!otherPole.neighbours.filter(n => (n.position == pole.position)).length)
+                        otherPole.neighbours.push(pole);
+
+                })
+
             });
         });
     }
@@ -345,7 +346,7 @@ export default class RailSection extends Blueprint {
         let yJump = from.y > to.y ? -1 : 1;
 
 
-        
+
         let x, y, s;
         for (let j = 0; j <= target; j += 2) {
             switch (direction) {
@@ -355,9 +356,9 @@ export default class RailSection extends Blueprint {
                     s = { x: 0, y: -2 };
                     break;
                 case 5://bottom left to top right
-                    x = from.x + j * xJump -2;
-                    y = from.y + yJump * j -2;
-                    s = { x:-2, y: 0 };
+                    x = from.x + j * xJump - 2;
+                    y = from.y + yJump * j - 2;
+                    s = { x: -2, y: 0 };
                     break;
                 case 3: // top left to bottom right
                     x = from.x + j * xJump - 2;
@@ -370,20 +371,17 @@ export default class RailSection extends Blueprint {
                     s = { x: 2, y: 0 };
             }
 
-         
-
-
             // straight across
             if (from.y == to.y) {
                 this.createEntity('straight-rail', { x: from.x + j * xJump, y: from.y }, direction, true);
                 //diagonal
-            } else if (from.x == to.x){
-                this.createEntity('straight-rail', { x: from.x, y: from.y +  j * yJump }, direction, true);
-            }else {
+            } else if (from.x == to.x) {
+                this.createEntity('straight-rail', { x: from.x, y: from.y + j * yJump }, direction, true);
+            } else {
                 this.createEntity('straight-rail', { x: x, y: y }, direction, true);
                 if (j + 1 <= target)
-                     this.createEntity('straight-rail', { x: x + s.x, y: y + s.y }, RailSection.flip(direction), true);
-             
+                    this.createEntity('straight-rail', { x: x + s.x, y: y + s.y }, RailSection.flip(direction), true);
+
             }
         }
     }
@@ -411,6 +409,12 @@ const rotateMatrix90C = source => {
     // return the destination matrix
     return destination;
 };
+
+function calculateDistance(pointA, pointB) {
+    return Math.sqrt(
+        Math.pow(pointA.x - pointB.x, 2) + Math.pow(pointA.y - pointB.y, 2)
+    )
+}
 
 function flipMatrix(matrix, direction = "horizontal") {
     const flippedMatrix = [];

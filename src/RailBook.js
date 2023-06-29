@@ -18,7 +18,7 @@ export default class RailBook {
                 this.createCornerBlueprint(),
                 this.createIntersectionT(),
                 this.createIntersectionX(),
-                this.createCurveTest(),
+             //   this.createCurveTest(),
                ].concat(this.createStations());
     }
 
@@ -74,10 +74,10 @@ export default class RailBook {
         xRail.addRailConnections({ left: true, bottom: true, right: true, top: true }, true, true);
         xRail.createTwoLanesAcross();
         xRail.createTwoLanesDown();
-        xRail.createCurvedRail({signals: true, poles: true});
-        xRail.createCurvedRail({rotations: 1, signals: true});
-        xRail.createCurvedRail({rotations: 2, signals: true});
-        xRail.createCurvedRail({rotations: 3, signals: true});
+        xRail.createCurvedRail();
+        xRail.createCurvedRail({rotations: 1});
+        xRail.createCurvedRail({rotations: 2});
+        xRail.createCurvedRail({rotations: 3});
 
         xRail.setSnapping();
         return xRail;
@@ -132,11 +132,11 @@ export default class RailBook {
 
     generate() {
         this.blueprints.forEach(bp => {
-            console.log(bp);
-            console.log(bp.toObject())
+            console.log(bp.entities.filter(entity => (entity.name == 'big_electric_pole'
+        )));
             bp.addLandfill();
         });
-        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing-2}]`, icons: ['rail', `signal_${this.trackSpacing-2}`]}), this.blueprints[0].toJSON()];
+        return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing-2}]`, icons: ['rail', `signal_${(this.trackSpacing-2) % 10}`]}), this.blueprints[0].toJSON()];
 
     }
 }

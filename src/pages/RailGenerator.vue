@@ -15,7 +15,7 @@
     </v-card>
     <v-card>
       <v-card-text>
-        <RailSlider label="Grid Size" :max=96 :min=36 :step=4 v-model="gridSize" />
+        <RailSlider label="Grid Size" :max=52 :min=36 :step=4 v-model="gridSize" />
         <RailSlider label="Track Spacing" :max=10 :min=4 :step=2 v-model="trackSpacing" />
       </v-card-text>
     </v-card>
@@ -37,12 +37,7 @@
 <script>
 import RailBook from '@/RailBook.js';
 import RailSlider from '@/components/RailSlider.vue';
-import { useAppStore } from '@/store/app';
-import { storeToRefs } from 'pinia'
 
-
-let appStore = useAppStore();
-const { railSettings } = storeToRefs(appStore);
 
 export default {
   data: () => ({
