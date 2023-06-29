@@ -159,15 +159,40 @@ export default class RailSection extends Blueprint {
                 })
 
             } else {
-                for (let x = 0; x < e.size.x; x++) {
-                    for (let y = 0; y < e.size.y; y++) {
-                        if (e.diretion % 2 == 0) {
-                            this.createTile('landfill', { x: e.position.x + x, y: e.position.y + y });
-                        } else {
+                if (e.name != 'straight_rail' || e.direction % 2 == 0) {
+                    for (let x = 0; x < e.size.x; x++) {
+                      for (let y = 0; y < e.size.y; y++) {
 
-                            this.createTile('landfill', { x: e.position.x + x, y: e.position.y + y });
+                         this.createTile('landfill', { x: e.position.x + x, y: e.position.y + y });
+                        
                         }
                     }
+                 } else {
+                    let landfillShape = [
+                        [1, 1],
+                        [1, 0]
+                    ];
+                    switch( e.direction) {
+                        case 3:
+                            landfillShape = flipMatrix(landfillShape);
+                            landfillShape = rotateMatrix90C(landfillShape);
+                            break;
+                        case 1: 
+                          landfillShape = rotateMatrix90C(landfillShape);
+                             break;
+                        case 5: 
+                        landfillShape = flipMatrix(landfillShape, "vertical");
+                        break;
+
+                    }
+                    landfillShape.forEach((data, row) => {
+                        data.forEach((hasLandfill, col) => {
+                            if (hasLandfill) {
+                                this.createTile('landfill', { x: e.position.x + col, y: e.position.y + row});
+                            }
+                        });
+                    })
+                   // this.createTile('landfill', { x: e.position.x, y: e.position.y });
                 }
             }
 
@@ -191,8 +216,8 @@ export default class RailSection extends Blueprint {
         ];
         if (poles) {
             let poleCoordinate = {
-                x: this.guides.zero + this.gridSize / 4 + (this.trackSpacing - 2) / 4,
-                y: this.guides.max - this.gridSize / 4 - (this.trackSpacing - 2) / 4,
+                x: this.guides.zero + this.gridSize / 4 + Math.ceil((this.trackSpacing - 2) / 4),
+                y: this.guides.max - this.gridSize / 4 - Math.ceil((this.trackSpacing - 2) / 4),
 
             }
             rails.push(
@@ -280,16 +305,19 @@ export default class RailSection extends Blueprint {
             let bmap = rtsbase.map(entity => {
                 let rotatedEntity = Object.assign({}, entity);
                 rotatedEntity.position = RailSection.rotateCoordinate(rotatedEntity.position, this.gridSize, rotatedEntity.offset, 2);
+                rotatedEntity.direction = RailSection.rotateDirection(rotatedEntity.direction, 2);
                 return rotatedEntity;
             });
             sections = sections.concat(bmap);
         }
         if (directions.top) {
-            sections.push({ entity: 'straight-rail', position: { x: this.guides.left, y: this.guides.zero }, direction: Blueprint.UP });
-            sections.push({ entity: 'straight-rail', position: { x: this.guides.right, y: this.guides.zero }, direction: Blueprint.DOWN });
-            if (signals) sections.push({ entity: 'rail-signal', position: { x: this.guides.right + 1, y: this.guides.zero }, direction: Blueprint.UP });
-            if (poles) sections.push({ entity: 'big-electric-pole', position: { x: this.guides.center, y: this.guides.zero - this.globalOffset }, direction: Blueprint.RIGHT });
-
+            let bmap = rtsbase.map(entity => {
+                let rotatedEntity = Object.assign({}, entity);
+                rotatedEntity.position = RailSection.rotateCoordinate(rotatedEntity.position, this.gridSize, rotatedEntity.offset, 3);
+                rotatedEntity.direction = RailSection.rotateDirection(rotatedEntity.direction, 3);
+                return rotatedEntity;
+            });
+            sections = sections.concat(bmap);
         }
 
         sections.forEach(s => {

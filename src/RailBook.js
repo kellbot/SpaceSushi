@@ -18,7 +18,7 @@ export default class RailBook {
                 this.createCornerBlueprint(),
                 this.createIntersectionT(),
                 this.createIntersectionX(),
-             //   this.createCurveTest(),
+                this.createCurveTest(),
                ].concat(this.createStations());
     }
 
