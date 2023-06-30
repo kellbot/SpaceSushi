@@ -24,7 +24,7 @@ export default class Station extends RailSection {
         this.engineLength = this.doubleSided ? this.engineCount * 2 * 7 : this.engineCount * 7;
         this.start = { x: this.guides.zero + this.engineCount * 7 + 1, y: this.guides.top - 2 };
         this.end = { x: this.guides.zero + this.engineLength + this.trainLength * 7 - 2, y: this.guides.top - 10};
-
+        this.guides.top = this.guides.top + this.globalOffset;
         this.placeTrack();
     }
 
@@ -143,7 +143,7 @@ export default class Station extends RailSection {
         let loader = new Blueprint().load(importStrings.loaderX4);
         let rotation = options.beltSide == 'same' ? this.ROTATION_180_CCW : this.ROTATION_NONE;
   
-        station.placeBlueprint(loader, { x: station.start.x - 1, y: station.guides.top - 9 }, rotation);
+       station.placeBlueprint(loader, { x: station.start.x - 1, y: station.guides.top - 9}, rotation);
         
 
         let poles = station.createBuffer(Blueprint.UP);

@@ -1,5 +1,6 @@
 <template>
   <v-container>
+
     <v-card>
       <v-card-text>
         Rail generator creates a book of blueprints based on the grid size and track spacing. Track spacing must be a
@@ -13,25 +14,32 @@
         </v-list>
       </v-card-text>
     </v-card>
-    <v-card>
-      <v-card-text>
-        <RailSlider label="Grid Size" :max=52 :min=36 :step=4 v-model="gridSize" />
-        <RailSlider label="Track Spacing" :max=10 :min=4 :step=2 v-model="trackSpacing" />
-      </v-card-text>
+    <v-card class="pa-5 my-2">
+      <v-row>
+
+        <v-col cols="4">
+          <RailSlider label="Grid Size" :max=52 :min=36 :step=4 v-model="gridSize" />
+          <RailSlider label="Track Spacing" :max=10 :min=4 :step=2 v-model="trackSpacing" />
+        </v-col>
+        <v-col cols="8">
+          <v-card-title>Create blueprint with grid size {{ gridSize }}</v-card-title>
+          <v-card-text>          <v-btn @click="generate()">
+            Generate
+          </v-btn>
+          <v-btn @click="copyCode">
+            Copy Blueprint to Clipboard
+          </v-btn>
+
+          <v-expansion-panels>
+            <v-expansion-panel title="View Blueprint" :text="blueprintString">
+            </v-expansion-panel>
+          </v-expansion-panels>
+</v-card-text>
+
+        </v-col>
+
+      </v-row>
     </v-card>
-    <v-card>
-      <v-card-title>Create blueprint with grid size {{ gridSize }}</v-card-title>
-      <v-card-text>
-        <v-btn @click="generate()">
-          Generate
-        </v-btn>
-        <v-btn @click="copyCode">
-          Copy
-        </v-btn>
-        {{ blueprintString }}
-      </v-card-text>
-    </v-card>
-    {{ straightJSON }}
   </v-container>
 </template>
 <script>
