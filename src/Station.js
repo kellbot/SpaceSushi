@@ -22,9 +22,10 @@ export default class Station extends RailSection {
         this.trainLength = 4; //how many cargo / fluid cars
         this.doubleSided = true;
         this.engineLength = this.doubleSided ? this.engineCount * 2 * 7 : this.engineCount * 7;
-        this.start = { x: this.guides.zero + this.engineCount * 7 + 1, y: this.guides.top - 2 };
-        this.end = { x: this.guides.zero + this.engineLength + this.trainLength * 7 - 2, y: this.guides.top - 10};
         this.guides.top = this.guides.top + this.globalOffset;
+        this.start = { x: this.guides.zero + this.engineCount * 7 + +this.globalOffset + 1, y: this.guides.top - 2 };
+        this.end = { x: this.guides.zero + this.engineLength + this.trainLength * 7 - 2, y: this.guides.top - 10};
+
         this.placeTrack();
     }
 
