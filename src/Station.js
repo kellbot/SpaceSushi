@@ -25,10 +25,10 @@ export default class Station extends RailSection {
         this.engineLength = this.doubleSided ? this.engineCount * 2 * 7 : this.engineCount * 7;
 
         this.cargoStart = { x: this.guides.zero + this.engineCount * 7 + this.globalOffset, y: this.guides.zero + this.globalOffset };
-        this.trackStart = { x:  this.guides.zero + this.globalOffset, y: this.guides.zero +  this.globalOffset };
+        this.trackStart = { x: this.guides.zero + this.globalOffset, y: this.guides.zero + this.globalOffset };
 
         this.trackEnd = { x: this.trackStart.x + this.engineLength + this.trainLength * 7 - 2, y: this.trackStart.y };
-      
+
         this.placeTrack();
     }
 
@@ -104,35 +104,41 @@ export default class Station extends RailSection {
         let station = new Station(parent);
         let entities = [
             // top curve
-             { name: 'curved-rail', position: { x: station.trackEnd.x + 6.5, y: station.trackEnd.y + 0.5}, direction: 2 },
-             { name: 'curved-rail', position: { x: station.trackEnd.x + 12.5, y: station.trackEnd.y - 5.5 }, direction: 5 },
-             {name: 'straight-rail', position: {x: station.trackEnd.x + 8 , y:  station.trackEnd.y - 4 }, direction: 3},
-            
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 6.5, y: station.trackEnd.y + 0.5 }, direction: 2 },
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 12.5, y: station.trackEnd.y - 5.5 }, direction: 5 },
+            { name: 'straight-rail', position: { x: station.trackEnd.x + 8, y: station.trackEnd.y - 4 }, direction: 3 },
+
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 7.5 , y: station.trackEnd.y - 4.5 }, direction: 1},
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 9.5 , y: station.trackEnd.y - 2.5 }, direction: 5},
+
             // // bottom  curve
 
-            {name: 'curved-rail', position: {x: station.trackEnd.x + 6.5 , y: station.trackEnd.y + 2.5 }, direction: 3},
-            {name: 'curved-rail', position: {x: station.trackEnd.x + 12.5 , y: station.trackEnd.y  + 8.5 }, direction: 0},
-            {name: 'straight-rail', position: {x: station.trackEnd.x + 8 , y:  station.trackEnd.y + 4 }, direction: 1},
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 6.5, y: station.trackEnd.y + 2.5 }, direction: 3 },
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 12.5, y: station.trackEnd.y + 8.5 }, direction: 0 },
+            { name: 'straight-rail', position: { x: station.trackEnd.x + 8, y: station.trackEnd.y + 4 }, direction: 1 },
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 7.5 , y: station.trackEnd.y + 4.5 }, direction: 7},
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 9.5 , y: station.trackEnd.y + 2.5 }, direction: 3},
 
-            //     {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 , y: station.guides.top - 4.5 }, direction: 1},
-            //     {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 , y: station.guides.top - 2.5 }, direction: 5},
+            //straight track signals
+            { name: 'rail-chain-signal', position: { x: station.trackEnd.x + 11, y: station.trackEnd.y - 10 }, direction: Blueprint.UP },
+            { name: 'rail-chain-signal', position: { x: station.trackEnd.x + 14, y: station.trackEnd.y - 10 }, direction: Blueprint.DOWN },
+
+            
+            //    
 
 
             //    {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 , y: station.guides.top + 4.5 }, direction: 7},
             //    {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 , y: station.guides.top + 2.5 }, direction: 3},
 
-            //    //straight track signals
-            //     {name: 'rail-chain-signal', position: {x: station.end.x +10.5 , y: station.guides.center - 14 }, direction: Blueprint.UP},
-            //     {name: 'rail-chain-signal', position: {x: station.end.x +13.5 , y: station.guides.center - 14 }, direction: Blueprint.DOWN},
 
         ]
         entities.forEach(entity => {
             station.createEntity(entity.name, entity.position, entity.direction, true);
         })
-        // station.runRail(
-        //     {x: station.end.x + 12, y: station.start.y - 15}, 
-        //     {x: station.end.x + 12, y: station.start.y +  station.globalOffset + 11})
-        // if (includeStop) station.createEntity('train_stop', { x: station.guides.zero, y: station.guides.top - 2 }, Blueprint.LEFT);
+        station.runRail(
+            { x: station.trackEnd.x + 12, y: station.trackEnd.y - 10 },
+            { x: station.trackEnd.x + 12, y: station.trackEnd.y + 10 })
+        if (includeStop) station.createEntity('train_stop', { x: station.guides.zero, y: station.guides.top - 2 }, Blueprint.LEFT);
         return station;
     }
 
