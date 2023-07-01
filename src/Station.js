@@ -43,26 +43,32 @@ export default class Station extends RailSection {
         })
     }
 
-    createBuffer(direction) {
+    createBuffer(direction, position = {x: 0, y: 0}) {
         let lastChest;
         let poles = [];
+        
+
+
         for (let i = 0; i < this.trainLength; i++) {
-            let leftPole = this.createEntity('medium-electric-pole', { x: this.start.x + (i * 7) - 1, y: this.start.y - 0.5 });
+            let leftPole = this.createEntity('medium-electric-pole', { x: position.x + (i * 7) - 1, y: position.y });
+
             poles.push(leftPole);
             if (lastChest) leftPole.connect(lastChest, null, null, "green");
-            if (i == this.trainLength - 1) poles.push(this.createEntity('medium-electric-pole', { x: this.start.x + (i * 7) + 6, y: this.start.y - 0.5 }));
+
             for (let j = 0; j < 6; j++) {
-                let chest = this.createEntity('steel-chest', { x: this.start.x + j + (i * 7), y: this.start.y - 0.5 });
+                let chest = this.createEntity('steel-chest', { x: position.x + j + (i * 7), y: position.y });
                 if (j == 0) {
                     chest.connect(poles[i], null, null, "green")
                 } else {
                     chest.connect(lastChest, null, null, "green");
                 }
-                this.createEntity('stack-inserter', { x: this.start.x + j + (i * 7), y: this.start.y - 1.5 }, direction);
-                this.createEntity('stack-inserter', { x: this.start.x + j + (i * 7), y: this.start.y + 0.5 }, direction);
+                this.createEntity('stack-inserter', { x: position.x  + j + (i * 7), y: position.y - 1.5 }, direction);
+                this.createEntity('stack-inserter', { x: position.x  + j + (i * 7), y: position.y + 0.5 }, direction);
                 lastChest = chest;
             }
+            if (i == this.trainLength - 1) poles.push(this.createEntity('medium-electric-pole', { x: 0.5 + (i * 7) + 6, y: -0.5 }).connect(lastChest, null, null, "green"));
         }
+              
         return poles;
     }
 
@@ -102,12 +108,12 @@ export default class Station extends RailSection {
             {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 2.5 + station.globalOffset}, direction: 3},
             
             {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 9 + station.globalOffset}, direction: 3},
-            {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top - 4.5 + station.globalOffset}, direction: 1},
-            {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top - 2.5 + station.globalOffset}, direction: 5},
+            {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top - 4.5 }, direction: 1},
+            {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top - 2.5 }, direction: 5},
 
            {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 1 + station.globalOffset}, direction: 1},
-           {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top + 4.5 + station.globalOffset}, direction: 7},
-           {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top + 2.5 + station.globalOffset}, direction: 3},
+           {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top + 4.5 }, direction: 7},
+           {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top + 2.5 }, direction: 3},
          
            //straight track signals
             {name: 'rail-chain-signal', position: {x: station.end.x +10.5 + station.globalOffset, y: station.guides.center + station.globalOffset - 14 }, direction: Blueprint.UP},
@@ -124,33 +130,55 @@ export default class Station extends RailSection {
         return station;
     }
 
-    static unloader(parent, options = {name: "Unloader [50]",  doubleSided: false, flipBelts: false, beltSide: 'same', stackSize: 50 }) {
+    addBufferBeltsStop(style = "loader") {
+        let beltPrint, rotation, bufferPosition;
+        let position = { x: this.start.x - 1, y: this.guides.top - 9};
+
+        if (style == 'loader') {
+            beltPrint = new Blueprint().load(importStrings.loaderX4);
+            
+        } else {
+            beltPrint = new Blueprint().load(importStrings.unloaderX4);
+        }
+        if (this.parent.bufferSide == 'same') {
+
+           rotation = Blueprint.ROTATION_NONE;
+           bufferPosition = {x: position.x + 1, y: position.y + 7};
+
+        } else {
+            
+            bufferPosition = {x: position.x, y: position.y + 12};
+            position.y = position.y + 18;
+            position.x = position.x + 26;
+            rotation = Blueprint.ROTATION_180_CCW;
+        }
+
+
+        let bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.UP : Blueprint.DOWN ;
+
+        this.placeBlueprint(beltPrint, position, rotation);
+        let stop = this.placeStop();
+
+        let poles = this.createBuffer(bufferDirection, bufferPosition);
+        this.connectPower(poles);
+        
+        stop.connect(poles[0], null, null, "green");
+    }
+
+    static unloader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
-        let unloader = new Blueprint().load(importStrings.unloaderX4);
-        let rotation = options.beltSide == 'same' ? this.ROTATION_180_CCW : this.ROTATION_NONE;
-        station.placeBlueprint(unloader, { x: station.start.x - 1, y:  station.guides.top - 9}, rotation);
-        let poles = station.createBuffer(Blueprint.DOWN);
-        station.connectPower(poles);
-        station.placeStop({belts: 'unloader'}).connect(poles[0], null, null, "green");
+    
+        station.addBufferBeltsStop("unloader");
+
         return station;
     }
 
-    static loader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, beltSide: 'same', stackSize: 50 }) {
+    static loader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
-        let start = station.start;
-
-        let loader = new Blueprint().load(importStrings.loaderX4);
-        let rotation = options.beltSide == 'same' ? this.ROTATION_180_CCW : this.ROTATION_NONE;
-  
-       station.placeBlueprint(loader, { x: station.start.x - 1, y: station.guides.top - 9}, rotation);
-        
-
-        let poles = station.createBuffer(Blueprint.UP);
-        station.connectPower(poles);
-        
-        station.placeStop().connect(poles[0], null, null, "green");
+    
+        station.addBufferBeltsStop("loader");
 
         return station;
     }

@@ -70,7 +70,7 @@
 
 "@kellbot/factorio-blueprint@github:kellbot/factorio-blueprint#trimmedoutput":
   version "2.6.7"
-  resolved "git+ssh://git@github.com/kellbot/factorio-blueprint.git#4f7777ff066860008db7a111d20b65bcd2982109"
+  resolved "git+ssh://git@github.com/kellbot/factorio-blueprint.git#a71e0a9223396bc14d354a096402a02ea9e04484"
 
 "@mdi/font@7.0.96":
   version "7.0.96"
