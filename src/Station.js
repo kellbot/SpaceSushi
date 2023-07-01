@@ -80,7 +80,7 @@ export default class Station extends RailSection {
         let multiplier = (style == 'loader') ? 40 * this.trainLength : 40 * this.trainLength * 3;
         let tData = {
             name: 'train_stop',
-            position: { x: this.guides.zero, y: this.guides.top - 2 },
+            position: { x: this.trackStart.x, y: this.trackStart.y - 2 },
             direction: direction,
             manual_trains_limit: 1,
             control_behavior: {
@@ -122,15 +122,6 @@ export default class Station extends RailSection {
             //straight track signals
             { name: 'rail-chain-signal', position: { x: station.trackEnd.x + 11, y: station.trackEnd.y - 10 }, direction: Blueprint.UP },
             { name: 'rail-chain-signal', position: { x: station.trackEnd.x + 14, y: station.trackEnd.y - 10 }, direction: Blueprint.DOWN },
-
-            
-            //    
-
-
-            //    {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 , y: station.guides.top + 4.5 }, direction: 7},
-            //    {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 , y: station.guides.top + 2.5 }, direction: 3},
-
-
         ]
         entities.forEach(entity => {
             station.createEntity(entity.name, entity.position, entity.direction, true);
@@ -142,11 +133,11 @@ export default class Station extends RailSection {
         return station;
     }
 
-    addBufferBeltsStop(style = "loader") {
+    addItemHandler(style = "loader") {
         if (!this.trainStop) throw new Exception("Train stop must be created before buffer belts can be added");
 
         let beltPrint, rotation, bufferPosition, bufferDirection;
-        let position = { x: this.start.x - 1, y: this.start.y - 9 };
+        let position = { x: this.cargoStart.x, y: this.cargoStart.y - 9 };
 
         if (style == 'loader') {
             beltPrint = new Blueprint().load(importStrings.loaderX4);
@@ -181,7 +172,7 @@ export default class Station extends RailSection {
         station.name = options.name;
         station.placeStop({ style: 'unloader', stackSize: options.stackSize });
 
-        //  station.addBufferBeltsStop("unloader");
+        station.addItemHandler("unloader");
 
         return station;
     }
@@ -191,7 +182,7 @@ export default class Station extends RailSection {
         station.name = options.name;
         station.placeStop({ style: 'loader', stackSize: options.stackSize });
 
-        //    station.addBufferBeltsStop("loader");
+        station.addItemHandler("loader");
 
         return station;
     }

@@ -31,11 +31,10 @@ export default class RailBook {
     createStations() {
         let stackSizes = [10, 50, 100, 200];
         let blueprints = [];
-        blueprints.push(Station.basic(this));
-        // stackSizes.forEach(size => {
-        //     blueprints.push(Station.loader(this, {name: `Loader [${size}]`, stackSize: size}));
-        //     blueprints.push(Station.unloader(this, {name: `Unloader [${size}]`, stackSize: size}));
-        // })
+        stackSizes.forEach(size => {
+            blueprints.push(Station.loader(this, {name: `Loader [${size}]`, stackSize: size}));
+            blueprints.push(Station.unloader(this, {name: `Unloader [${size}]`, stackSize: size}));
+        })
         return blueprints;
     }
 
