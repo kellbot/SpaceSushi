@@ -104,15 +104,15 @@ export default class Station extends RailSection {
         let station = new Station(parent);
         let entities = [
             // top curve
-             { name: 'curved-rail', position: { x: station.trackEnd.x + 6, y: station.trackEnd.y + 1}, direction: 2 },
-            // { name: 'curved-rail', position: { x: station.trackEnd.x + 12, y: station.trackEnd.y - 5 }, direction: 5 },
-            // {name: 'straight-rail', position: {x: station.trackEnd.x + 8 , y:  station.trackEnd.y - 5 }, direction: 3},
+             { name: 'curved-rail', position: { x: station.trackEnd.x + 6.5, y: station.trackEnd.y + 0.5}, direction: 2 },
+             { name: 'curved-rail', position: { x: station.trackEnd.x + 12.5, y: station.trackEnd.y - 5.5 }, direction: 5 },
+             {name: 'straight-rail', position: {x: station.trackEnd.x + 8 , y:  station.trackEnd.y - 4 }, direction: 3},
             
             // // bottom  curve
 
-            // {name: 'curved-rail', position: {x: station.trackEnd.x + 6 , y: station.trackEnd.y + 3 }, direction: 3},
-            // {name: 'curved-rail', position: {x: station.trackEnd.x + 12 , y: station.trackEnd.y  + 9 }, direction: 0},
-            // {name: 'straight-rail', position: {x: station.trackEnd.x + 8 , y:  station.trackEnd.y + 3 }, direction: 1},
+            {name: 'curved-rail', position: {x: station.trackEnd.x + 6.5 , y: station.trackEnd.y + 2.5 }, direction: 3},
+            {name: 'curved-rail', position: {x: station.trackEnd.x + 12.5 , y: station.trackEnd.y  + 8.5 }, direction: 0},
+            {name: 'straight-rail', position: {x: station.trackEnd.x + 8 , y:  station.trackEnd.y + 4 }, direction: 1},
 
             //     {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 , y: station.guides.top - 4.5 }, direction: 1},
             //     {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 , y: station.guides.top - 2.5 }, direction: 5},
