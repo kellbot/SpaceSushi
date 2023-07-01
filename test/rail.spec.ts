@@ -47,6 +47,21 @@ describe("Tracks", () => {
             expect(tracks.length).not.toBe(0);
         })
     });
+    it("shouild align tracks consistently", () => {
+        const rb = new RailBook({ trackSpacing: 6});
+        rb.blueprints.forEach(bp => {
+            let tracks = bp.toObject().blueprint.entities.filter(e => (trackNames.includes(e.name.replaceAll('_', '-'))));
+
+            tracks.forEach(track => {
+                if(!(Math.abs(track.position.x % 2) == Math.abs(track.position.y % 2))) {
+                    console.log('Name' + bp.name);
+                    console.log(track.name);
+                   console.log(track.position);
+                }
+                expect(Math.abs(track.position.x % 2)).toBe(Math.abs(track.position.y % 2));
+            })
+        })
+    });
     it("should only place tracks and poleson whole numbers", () => {
         const rb = new RailBook({ trackSpacing: 8 });
         let entitiyNames = trackNames.concat(['big-electric-pole']);
@@ -54,6 +69,7 @@ describe("Tracks", () => {
 
             bp.toObject().blueprint.entities.filter(e => (entitiyNames.includes(e.name))).forEach(e => {
                 if (!Number.isInteger(e.position.x) || !Number.isInteger(e.position.y)) {
+                    console.log("Noninteger Placement of Rail");
                     console.log(bp.name);
                     console.log(e);
                 }

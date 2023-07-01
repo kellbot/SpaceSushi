@@ -216,8 +216,8 @@ export default class RailSection extends Blueprint {
         ];
         if (poles) {
             let poleCoordinate = {
-                x: this.guides.zero + (this.guides.center + 4)/2,
-                y: this.guides.max - (this.guides.center + 4)/2 - 2
+                x: this.guides.zero + Math.round((this.guides.center + 4)/2),
+                y: this.guides.max - Math.round((this.guides.center + 4)/2) - 2
             }
             rails.push(
                 { ent: 'big-electric-pole', pos: poleCoordinate, dir: 0, entityOffset: { w: 1, h: 1 } }
@@ -411,6 +411,46 @@ export default class RailSection extends Blueprint {
 
             }
         }
+    }
+    
+    tSignals(rotations = 0) {
+        let signals =   [
+            // top and bottom middle
+            { pos: { x: this.guides.center, y: this.guides.top - 1 }, dir: Blueprint.RIGHT },
+            { pos: { x: this.guides.center, y: this.guides.bottom + 2 }, dir: Blueprint.LEFT },
+            // bottom 1/4 and 3/4
+            { pos: { x: this.guides.zero + 7, y: this.guides.bottom + 2 }, dir: Blueprint.LEFT },
+            { pos: { x: this.guides.max - 8, y: this.guides.bottom + 2 }, dir: Blueprint.LEFT },
+            // above / below right curve
+            { pos: { x: this.guides.max - 10, y: this.guides.top + 2 }, dir: Blueprint.RIGHT - 1 },
+            { pos: { x: this.guides.center + this.trackSpacing / 2 + 4, y: this.guides.max - 6 }, dir: Blueprint.LEFT - 1 },
+            // above / below left curve
+            { pos: { x: this.guides.zero + 9, y: this.guides.top + 2 }, dir: Blueprint.RIGHT + 1 },
+            { pos: { x: this.guides.center - this.trackSpacing / 2 - 3, y: this.guides.max - 6 }, dir: Blueprint.LEFT + 1 },
+        ];
+        
+        // inside triangle curves - only works above a certain size
+        if (this.gridSize > 36) {
+            signals = signals.concat([
+                { pos: { x: this.guides.center + 3 + (10- this.trackSpacing) + this.globalOffset, y: this.guides.bottom + 4 }, dir: Blueprint.RIGHT - 1 },
+                { pos: { x: this.guides.center - 2 - (10- this.trackSpacing) - this.globalOffset, y: this.guides.bottom + 4 }, dir: Blueprint.RIGHT + 1 }
+            ]);
+        }
+
+        if (this.trackSpacing > 6) {
+            signals = signals.concat([
+                { pos: { x: this.guides.left + 2, y: this.guides.max -10 }, dir: Blueprint.RIGHT - 1 },
+                { pos: { x: this.guides.right - 1, y: this.guides.max -10  }, dir: Blueprint.RIGHT + 1 }
+            ]);
+        }
+        if (!rotations) return signals;
+        
+  
+        return signals.map(signal => {
+            signal.pos = RailSection.rotateCoordinate(signal.pos, this.gridSize, {w: 0, h: 0}, rotations);
+            signal.dir = RailSection.rotateDirection(signal.dir);
+            return signal;
+        })
     }
 }
 
