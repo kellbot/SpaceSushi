@@ -46,8 +46,6 @@ export default class Station extends RailSection {
     createBuffer(direction, position = {x: 0, y: 0}) {
         let lastChest;
         let poles = [];
-        
-
 
         for (let i = 0; i < this.trainLength; i++) {
             let leftPole = this.createEntity('medium-electric-pole', { x: position.x + (i * 7) - 1, y: position.y });
@@ -66,7 +64,9 @@ export default class Station extends RailSection {
                 this.createEntity('stack-inserter', { x: position.x  + j + (i * 7), y: position.y + 0.5 }, direction);
                 lastChest = chest;
             }
-            if (i == this.trainLength - 1) poles.push(this.createEntity('medium-electric-pole', { x: 0.5 + (i * 7) + 6, y: -0.5 }).connect(lastChest, null, null, "green"));
+            if (i == this.trainLength - 1) 
+                poles.push(this.createEntity('medium-electric-pole', { x: position.x + (i * 7) + 6, y:  position.y })
+                    .connect(lastChest, null, null, "green"));
         }
               
         return poles;
