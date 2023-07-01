@@ -1,4 +1,5 @@
 
+import { Exception } from 'sass';
 import RailSection from './RailSection';
 import Blueprint from '@kellbot/factorio-blueprint';
 
@@ -72,8 +73,8 @@ export default class Station extends RailSection {
         return poles;
     }
 
-    placeStop({stackSize= 50, belts = 'loader', direction =  Blueprint.LEFT} = {}) {
-        let multiplier = (belts == 'loader') ? 40 * this.trainLength :  40 * this.trainLength * 3;
+    placeStop({stackSize= 50, style = 'loader', direction =  Blueprint.LEFT} = {}) {
+        let multiplier = (style == 'loader') ? 40 * this.trainLength :  40 * this.trainLength * 3;
         let tData = {
             name: 'train_stop',
             position: { x: this.guides.zero, y: this.guides.top - 2 },
@@ -83,15 +84,16 @@ export default class Station extends RailSection {
                 circuit_condition: {
                     first_signal: { 
                         type: 'virtual', 
-                        name: (belts == 'loader') ? 'signal_anything' : 'signal_everything'
+                        name: (style == 'loader') ? 'signal_anything' : 'signal_everything'
                     },
                     constant: stackSize * multiplier,
-                    comparator: (belts == 'loader') ? '>' : '<',
+                    comparator: (style == 'loader') ? '>' : '<',
                 },
                 circuit_enable_disable: true
             }
         };
         let tStop = this.createEntityWithData(tData);
+        this.trainStop = tStop;
         return tStop;
     }
 
@@ -131,14 +133,17 @@ export default class Station extends RailSection {
     }
 
     addBufferBeltsStop(style = "loader") {
-        let beltPrint, rotation, bufferPosition;
+        if (!this.trainStop) throw new Exception("Train stop must be created before buffer belts can be added");
+
+        let beltPrint, rotation, bufferPosition, bufferDirection;
         let position = { x: this.start.x - 1, y: this.guides.top - 9};
 
         if (style == 'loader') {
             beltPrint = new Blueprint().load(importStrings.loaderX4);
-            
+            bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.UP : Blueprint.DOWN ;
         } else {
             beltPrint = new Blueprint().load(importStrings.unloaderX4);
+            bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.DOWN : Blueprint.UP ;
         }
         if (this.parent.bufferSide == 'same') {
 
@@ -153,22 +158,19 @@ export default class Station extends RailSection {
             rotation = Blueprint.ROTATION_180_CCW;
         }
 
-
-        let bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.UP : Blueprint.DOWN ;
-
         this.placeBlueprint(beltPrint, position, rotation);
-        let stop = this.placeStop();
-
+       
         let poles = this.createBuffer(bufferDirection, bufferPosition);
         this.connectPower(poles);
         
-        stop.connect(poles[0], null, null, "green");
+        this.trainStop.connect(poles[0], null, null, "green");
     }
 
     static unloader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
-    
+        station.placeStop({style: 'unloader', stackSize: options.stackSize });
+
         station.addBufferBeltsStop("unloader");
 
         return station;
@@ -177,7 +179,8 @@ export default class Station extends RailSection {
     static loader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
-    
+        station.placeStop({style: 'loader', stackSize: options.stackSize });
+
         station.addBufferBeltsStop("loader");
 
         return station;

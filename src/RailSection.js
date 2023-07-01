@@ -216,9 +216,8 @@ export default class RailSection extends Blueprint {
         ];
         if (poles) {
             let poleCoordinate = {
-                x: this.guides.zero + this.gridSize / 4 + Math.ceil((this.trackSpacing - 2) / 4),
-                y: this.guides.max - this.gridSize / 4 - Math.ceil((this.trackSpacing - 2) / 4),
-
+                x: this.guides.zero + (this.guides.center + 4)/2,
+                y: this.guides.max - (this.guides.center + 4)/2 - 2
             }
             rails.push(
                 { ent: 'big-electric-pole', pos: poleCoordinate, dir: 0, entityOffset: { w: 1, h: 1 } }
