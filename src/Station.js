@@ -146,7 +146,7 @@ export default class Station extends RailSection {
            bufferPosition = {x: position.x + 1, y: position.y + 7};
 
         } else {
-            
+            position.x = position.x + 1;
             bufferPosition = {x: position.x, y: position.y + 12};
             position.y = position.y + 18;
             position.x = position.x + 26;
