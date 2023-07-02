@@ -70,6 +70,7 @@
 import ItemButton from '@/components/ItemButton.vue';
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia'
+import { namedIcons, namedItems, namedRecipes, namedCategories} from '@/shared';
 
 let appStore = useAppStore();
 
@@ -80,10 +81,10 @@ export default {
 		tab: null,
 
 		//scale icons
-		items: appStore.items,
-		icons: appStore.icons,
-		recipes: appStore.recipes,
-		categories: appStore.categories,
+		items: namedItems,
+		icons: namedIcons,
+		recipes: namedRecipes,
+		categories: namedCategories,
 		selectedRecipes: selectedRecipes
 	}),
 	props: {

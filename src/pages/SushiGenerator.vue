@@ -64,6 +64,8 @@ import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia'
 
 
+import { namedIcons, namedItems, namedRecipes} from '@/shared';
+
 let appStore = useAppStore();
 
 const { selectedRecipes } = storeToRefs(appStore);
@@ -71,9 +73,9 @@ const { selectedRecipes } = storeToRefs(appStore);
 export default {
   data: () => ({
     selectedRecipes: selectedRecipes,
-    items: appStore.items,
-    recipes: appStore.recipes,
-    icons: appStore.icons,
+    items: namedItems,
+    recipes: namedRecipes,
+    icons: namedIcons,
     blueprintString: ''
   }),
   methods: {

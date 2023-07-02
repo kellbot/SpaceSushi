@@ -29,6 +29,7 @@
 </template>
 <script>
 import { useAppStore } from '@/store/app';
+import producerData from '@/assets/producers.json';
 
 let appStore = useAppStore();
 import ItemPicker from '@/components/ItemPicker.vue';
@@ -36,7 +37,7 @@ export default {
   data: () => ({
     panel: [0],
     selected: ['electric-furnace', 'assembling-machine-3'],
-    producers: appStore.producers
+    producers: producerData,
   }),
   name: "ProducerSelector",
   components: { ItemPicker }
