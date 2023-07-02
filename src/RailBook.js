@@ -18,7 +18,7 @@ export default class RailBook {
                 this.createCornerBlueprint(),
                 this.createIntersectionT(),
                 this.createIntersectionX(),
-                this.createCurveTest(),
+        //        this.createCurveTest(),
                ].concat(this.createStations());
     }
 
@@ -41,7 +41,7 @@ export default class RailBook {
     createCurveTest() {
         let test = new RailSection(this);
         for (let i = 0; i < 8; i++) {
-            test.createEntity('curved-rail', { x: 8 * i + 1 + test.globalOffset, y: -21 + test.globalOffset }, i);
+            test.createEntity('curved-rail', { x: 8 * i + 1, y: -21}, i);
 
         }
         return test;
@@ -78,10 +78,15 @@ export default class RailBook {
         xRail.createCurvedRail({rotations: 1});
         xRail.createCurvedRail({rotations: 2});
         xRail.createCurvedRail({rotations: 3});
+        let signalPositions = xRail.tSignals().concat(xRail.tSignals(2));
 
+        signalPositions.forEach(s => {
+            xRail.createEntity('rail-chain-signal', s.pos, s.dir, true);
+        });
         xRail.setSnapping();
         return xRail;
     }
+
 
     createIntersectionT() {
         let tRail = new RailSection(this);
@@ -91,35 +96,8 @@ export default class RailBook {
         tRail.createCurvedRail();
         tRail.createCurvedRail({ power: true, rotations: 1 });
         //Signal direction points to rail
-        let signalPositions = [
-            // top and bottom middle
-            { pos: { x: tRail.guides.center, y: tRail.guides.top - 1 }, dir: Blueprint.RIGHT },
-            { pos: { x: tRail.guides.center, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
-            // bottom 1/4 and 3/4
-            { pos: { x: tRail.guides.zero + 10, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
-            { pos: { x: tRail.guides.max - 11, y: tRail.guides.bottom + 2 }, dir: Blueprint.LEFT },
-            // above / below right curve
-            { pos: { x: tRail.guides.max - 10, y: tRail.guides.top + 2 }, dir: Blueprint.RIGHT - 1 },
-            { pos: { x: tRail.guides.center + this.trackSpacing / 2 + 6, y: tRail.guides.max - 8 }, dir: Blueprint.LEFT - 1 },
-            // above / below left curve
-            { pos: { x: tRail.guides.zero + 9, y: tRail.guides.top + 2 }, dir: Blueprint.RIGHT + 1 },
-            { pos: { x: tRail.guides.center - this.trackSpacing / 2 - 5, y: tRail.guides.max - 8 }, dir: Blueprint.LEFT + 1 },
-        ];
+        let signalPositions = tRail.tSignals();
 
-        // inside triangle curves - only works above a certain size
-        if (this.gridSize > 36) {
-            signalPositions = signalPositions.concat([
-                { pos: { x: tRail.guides.center + 3 + (10- this.trackSpacing) + tRail.globalOffset, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT - 1 },
-                { pos: { x: tRail.guides.center - 2 - (10- this.trackSpacing) - tRail.globalOffset, y: tRail.guides.bottom + 4 }, dir: Blueprint.RIGHT + 1 }
-            ]);
-        }
-
-        if (this.trackSpacing > 6) {
-            signalPositions = signalPositions.concat([
-                { pos: { x: tRail.guides.left + 2, y: tRail.guides.max -10 }, dir: Blueprint.RIGHT - 1 },
-                { pos: { x: tRail.guides.right - 1, y: tRail.guides.max -10  }, dir: Blueprint.RIGHT + 1 }
-            ]);
-        }
 
         signalPositions.forEach(s => {
             tRail.createEntity('rail-chain-signal', s.pos, s.dir, true);

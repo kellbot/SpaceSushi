@@ -1,4 +1,5 @@
 
+import { Exception } from 'sass';
 import RailSection from './RailSection';
 import Blueprint from '@kellbot/factorio-blueprint';
 
@@ -22,17 +23,20 @@ export default class Station extends RailSection {
         this.trainLength = 4; //how many cargo / fluid cars
         this.doubleSided = true;
         this.engineLength = this.doubleSided ? this.engineCount * 2 * 7 : this.engineCount * 7;
-        this.guides.top = this.guides.top + this.globalOffset;
-        this.start = { x: this.guides.zero + this.engineCount * 7 + +this.globalOffset + 1, y: this.guides.top - 2 };
-        this.end = { x: this.guides.zero + this.engineLength + this.trainLength * 7 - 2, y: this.guides.top - 10};
+
+        this.cargoStart = { x: this.guides.zero + this.engineCount * 7 + this.globalOffset, y: this.guides.zero + this.globalOffset };
+        this.trackStart = { x: this.guides.zero + this.globalOffset, y: this.guides.zero + this.globalOffset };
+
+        this.trackEnd = { x: this.trackStart.x + this.engineLength + this.trainLength * 7 - 2, y: this.trackStart.y };
 
         this.placeTrack();
     }
 
     placeTrack() {
         let trackLength = this.engineLength + this.trainLength * 7 - 2;
-        this.runRail({ x: this.guides.zero, y: this.guides.top }, { x: this.guides.zero + trackLength, y: this.guides.top });
+        this.runRail(this.trackStart, { x: this.trackStart.x + trackLength, y: this.trackStart.y });
     }
+
 
     beltsFromMatrix(matrix, start) {
         matrix.forEach((row, y) => {
@@ -43,7 +47,7 @@ export default class Station extends RailSection {
         })
     }
 
-    createBuffer(direction, position = {x: 0, y: 0}) {
+    createBuffer(direction, position = { x: 0, y: 0 }) {
         let lastChest;
         let poles = [];
 
@@ -60,116 +64,115 @@ export default class Station extends RailSection {
                 } else {
                     chest.connect(lastChest, null, null, "green");
                 }
-                this.createEntity('stack-inserter', { x: position.x  + j + (i * 7), y: position.y - 1.5 }, direction);
-                this.createEntity('stack-inserter', { x: position.x  + j + (i * 7), y: position.y + 0.5 }, direction);
+                this.createEntity('stack-inserter', { x: position.x + j + (i * 7), y: position.y - 1.5 }, direction);
+                this.createEntity('stack-inserter', { x: position.x + j + (i * 7), y: position.y + 0.5 }, direction);
                 lastChest = chest;
             }
-            if (i == this.trainLength - 1) 
-                poles.push(this.createEntity('medium-electric-pole', { x: position.x + (i * 7) + 6, y:  position.y })
+            if (i == this.trainLength - 1)
+                poles.push(this.createEntity('medium-electric-pole', { x: position.x + (i * 7) + 6, y: position.y })
                     .connect(lastChest, null, null, "green"));
         }
-              
+
         return poles;
     }
 
-    placeStop({stackSize= 50, belts = 'loader', direction =  Blueprint.LEFT} = {}) {
-        let multiplier = (belts == 'loader') ? 40 * this.trainLength :  40 * this.trainLength * 3;
+    placeStop({ stackSize = 50, style = 'loader', direction = Blueprint.LEFT } = {}) {
+        let multiplier = (style == 'loader') ? 40 * this.trainLength : 40 * this.trainLength * 3;
         let tData = {
             name: 'train_stop',
-            position: { x: this.guides.zero, y: this.guides.top - 2 },
+            position: { x: this.trackStart.x, y: this.trackStart.y - 2 },
             direction: direction,
             manual_trains_limit: 1,
             control_behavior: {
                 circuit_condition: {
-                    first_signal: { 
-                        type: 'virtual', 
-                        name: (belts == 'loader') ? 'signal_anything' : 'signal_everything'
+                    first_signal: {
+                        type: 'virtual',
+                        name: (style == 'loader') ? 'signal_anything' : 'signal_everything'
                     },
                     constant: stackSize * multiplier,
-                    comparator: (belts == 'loader') ? '>' : '<',
+                    comparator: (style == 'loader') ? '>' : '<',
                 },
                 circuit_enable_disable: true
             }
         };
         let tStop = this.createEntityWithData(tData);
+        this.trainStop = tStop;
         return tStop;
     }
 
     static basic(parent, includeStop = true) {
         let station = new Station(parent);
         let entities = [
-            // top right curve
-            {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center - 10.5 + station.globalOffset}, direction: 5},        
-            // bottom right curve
-            {name: 'curved-rail', position: {x: station.end.x + 12.5 + station.globalOffset, y: station.guides.center + 3.5 + station.globalOffset}, direction: 0},
-            // top left curve
-            {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 4.5 + station.globalOffset}, direction: 2},
-            //bottom left curve
-            {name: 'curved-rail', position: {x: station.end.x + 6.5 + station.globalOffset, y: station.guides.center - 2.5 + station.globalOffset}, direction: 3},
-            
-            {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 9 + station.globalOffset}, direction: 3},
-            {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top - 4.5 }, direction: 1},
-            {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top - 2.5 }, direction: 5},
+            // top curve
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 6.5, y: station.trackEnd.y + 0.5 }, direction: 2 },
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 12.5, y: station.trackEnd.y - 5.5 }, direction: 5 },
+            { name: 'straight-rail', position: { x: station.trackEnd.x + 8, y: station.trackEnd.y - 4 }, direction: 3 },
 
-           {name: 'straight-rail', position: {x: station.end.x + 8 + station.globalOffset, y: station.guides.center - 1 + station.globalOffset}, direction: 1},
-           {name: 'rail-chain-signal', position: {x: station.end.x + 7.5 + station.globalOffset, y: station.guides.top + 4.5 }, direction: 7},
-           {name: 'rail-chain-signal', position: {x: station.end.x + 9.5 + station.globalOffset, y: station.guides.top + 2.5 }, direction: 3},
-         
-           //straight track signals
-            {name: 'rail-chain-signal', position: {x: station.end.x +10.5 + station.globalOffset, y: station.guides.center + station.globalOffset - 14 }, direction: Blueprint.UP},
-            {name: 'rail-chain-signal', position: {x: station.end.x +13.5 + station.globalOffset, y: station.guides.center + station.globalOffset - 14 }, direction: Blueprint.DOWN},
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 7.5 , y: station.trackEnd.y - 4.5 }, direction: 1},
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 9.5 , y: station.trackEnd.y - 2.5 }, direction: 5},
 
+            // // bottom  curve
+
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 6.5, y: station.trackEnd.y + 2.5 }, direction: 3 },
+            { name: 'curved-rail', position: { x: station.trackEnd.x + 12.5, y: station.trackEnd.y + 8.5 }, direction: 0 },
+            { name: 'straight-rail', position: { x: station.trackEnd.x + 8, y: station.trackEnd.y + 4 }, direction: 1 },
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 7.5 , y: station.trackEnd.y + 4.5 }, direction: 7},
+            {name: 'rail-chain-signal', position: {x: station.trackEnd.x + 9.5 , y: station.trackEnd.y + 2.5 }, direction: 3},
+
+            //straight track signals
+            { name: 'rail-chain-signal', position: { x: station.trackEnd.x + 11, y: station.trackEnd.y - 10 }, direction: Blueprint.UP },
+            { name: 'rail-chain-signal', position: { x: station.trackEnd.x + 14, y: station.trackEnd.y - 10 }, direction: Blueprint.DOWN },
         ]
         entities.forEach(entity => {
             station.createEntity(entity.name, entity.position, entity.direction, true);
         })
         station.runRail(
-            {x: station.end.x +  station.globalOffset + 12, y: station.guides.center +  station.globalOffset - 15}, 
-            {x: station.end.x +  station.globalOffset + 12, y: station.guides.top +  station.globalOffset + 11})
+            { x: station.trackEnd.x + 12, y: station.trackEnd.y - 10 },
+            { x: station.trackEnd.x + 12, y: station.trackEnd.y + 10 })
         if (includeStop) station.createEntity('train_stop', { x: station.guides.zero, y: station.guides.top - 2 }, Blueprint.LEFT);
         return station;
     }
 
-    addBufferBeltsStop(style = "loader") {
-        let beltPrint, rotation, bufferPosition;
-        let position = { x: this.start.x - 1, y: this.guides.top - 9};
+    addItemHandler(style = "loader") {
+        if (!this.trainStop) throw new Exception("Train stop must be created before buffer belts can be added");
+
+        let beltPrint, rotation, bufferPosition, bufferDirection;
+        let position = { x: this.cargoStart.x, y: this.cargoStart.y - 9 };
 
         if (style == 'loader') {
             beltPrint = new Blueprint().load(importStrings.loaderX4);
-            
+            bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.UP : Blueprint.DOWN;
         } else {
             beltPrint = new Blueprint().load(importStrings.unloaderX4);
+            bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.DOWN : Blueprint.UP;
         }
         if (this.parent.bufferSide == 'same') {
 
-           rotation = Blueprint.ROTATION_NONE;
-           bufferPosition = {x: position.x + 1, y: position.y + 7};
+            rotation = Blueprint.ROTATION_NONE;
+            bufferPosition = { x: position.x + 1, y: position.y + 7 };
 
         } else {
             position.x = position.x + 1;
-            bufferPosition = {x: position.x, y: position.y + 12};
+            bufferPosition = { x: position.x, y: position.y + 12 };
             position.y = position.y + 18;
             position.x = position.x + 26;
             rotation = Blueprint.ROTATION_180_CCW;
         }
 
-
-        let bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.UP : Blueprint.DOWN ;
-
         this.placeBlueprint(beltPrint, position, rotation);
-        let stop = this.placeStop();
 
         let poles = this.createBuffer(bufferDirection, bufferPosition);
         this.connectPower(poles);
-        
-        stop.connect(poles[0], null, null, "green");
+
+        this.trainStop.connect(poles[0], null, null, "green");
     }
 
     static unloader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
-    
-        station.addBufferBeltsStop("unloader");
+        station.placeStop({ style: 'unloader', stackSize: options.stackSize });
+
+        station.addItemHandler("unloader");
 
         return station;
     }
@@ -177,8 +180,9 @@ export default class Station extends RailSection {
     static loader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
-    
-        station.addBufferBeltsStop("loader");
+        station.placeStop({ style: 'loader', stackSize: options.stackSize });
+
+        station.addItemHandler("loader");
 
         return station;
     }
