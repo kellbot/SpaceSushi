@@ -11,9 +11,9 @@
           class="mx-0"
         >
           <ItemButton
-            v-for="recipeId in selectedRecipes"
-            :item="recipes[recipeId]"
-            :icon="icons[recipeId]"
+            v-for="itemId in selectedItems"
+            :item="items[itemId]"
+            :icon="icons[itemId]"
             :class="['d-flex align-center item-selected']"
           />
         </v-row>
@@ -27,7 +27,7 @@
           class="mx-0"
         >
           <ItemButton
-            v-for="itemId in intermedateRecipes()"
+            v-for="itemId in intermedateItems()"
             :item="items[itemId]"
             :icon="icons[itemId]"
             :class="['d-flex align-center item-selected']"
@@ -35,7 +35,7 @@
         </v-row>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="generate(selectedRecipes)">
+        <v-btn @click="generate(selectedItems)">
           Generate
         </v-btn>
       </v-card-actions>
@@ -64,31 +64,31 @@ import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia'
 
 
-import { namedIcons, namedItems, namedRecipes} from '@/shared';
+import { namedIcons, namedItems } from '@/shared';
 
 let appStore = useAppStore();
 
-const { selectedRecipes } = storeToRefs(appStore);
+const { selectedItems, selectedProducers } = storeToRefs(appStore);
 
 export default {
   data: () => ({
-    selectedRecipes: selectedRecipes,
+    selectedItems: selectedItems,
+    selectedProducers: selectedProducers,
     items: namedItems,
-    recipes: namedRecipes,
     icons: namedIcons,
     blueprintString: ''
   }),
   methods: {
-    intermedateRecipes() {
-      return getIntermediateProducts(this.selectedRecipes,
-       ['assembling-machine-1', 'assembling-machine-2', 'assembling-machine-3', 'electric-furnace', 'chemical-plant'],
+    intermedateItems() {
+      return getIntermediateProducts(this.selectedItems,
+       this.selectedProducers,
        true);
     },
     createBlueprintString() {
-      return getBlueprintString(Array.from(new Set(this.selectedRecipes.concat(this.intermedateRecipes(this.selectedRecipes)))))
+      return getBlueprintString(Array.from(new Set(this.selectedItems.concat(this.intermedateItems(this.selectedItems)))))
     },
     generate() {
-      this.blueprintString = this.createBlueprintString(this.selectedRecipes);
+      this.blueprintString = this.createBlueprintString(this.selectedItems);
     },
     async copyCode() {
       await navigator.clipboard.writeText(this.blueprintString);

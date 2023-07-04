@@ -10,7 +10,7 @@
             <v-checkbox
               density="compact"
               v-for="producer in producers"
-              v-model="selected"
+              v-model="selectedProducers"
               :label="producer.name"
               :value="producer.id"
             />
@@ -21,8 +21,10 @@
 
     <KeepAlive>
       <ItemPicker
-        :selected-producers="selected"
+        :selected-producers="selectedProducers"
         eager
+
+        :available-items="items"
       />
     </KeepAlive>
   </v-container>
@@ -30,15 +32,20 @@
 <script>
 import { useAppStore } from '@/store/app';
 import producerData from '@/assets/producers.json';
+import { storeToRefs } from 'pinia'
 
-let appStore = useAppStore();
+const { selectedProducers } = storeToRefs(useAppStore());
 import ItemPicker from '@/components/ItemPicker.vue';
+import { namedItems } from '@/shared';
 export default {
   data: () => ({
     panel: [0],
-    selected: ['electric-furnace', 'assembling-machine-3'],
+    selectedProducers: selectedProducers,
     producers: producerData,
   }),
+  computed : {
+    items: function () { return namedItems.filterByProducers(this.selectedProducers) },
+  },
   name: "ProducerSelector",
   components: { ItemPicker }
 }

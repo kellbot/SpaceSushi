@@ -10,7 +10,8 @@ export const useAppStore = defineStore('app', {
         gridSize: 48,
         trackSpacing: 6
       },
-      selectedRecipes: ['stack-inserter']
+      selectedItems: ['stack-inserter'],
+      selectedProducers: ['assembling-machine-2', 'assembling-machine-3'],
     }
   },
 })

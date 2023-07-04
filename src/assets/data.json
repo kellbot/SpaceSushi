@@ -5106,13 +5106,6 @@
             "category": "logistics"
         },
         {
-            "id": "se-space-capsule-scorched",
-            "name": "Compromised space capsule",
-            "stack": 1,
-            "row": 15,
-            "category": "logistics"
-        },
-        {
             "id": "se-delivery-cannon",
             "name": "Delivery cannon",
             "stack": 20,

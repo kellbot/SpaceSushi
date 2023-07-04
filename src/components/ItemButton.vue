@@ -1,6 +1,6 @@
 <template>
   <v-btn
-    :data-recipe-id="item.id"
+    :data-item-id="item.id"
     :class="['itemImage float-left']"
     :style="{ backgroundPosition: iconPos(icon) }"
   >
@@ -14,6 +14,7 @@
 </template>
 <script>
 export default {
+
   props: {
     item: Object,
     icon: Object,
@@ -25,7 +26,7 @@ export default {
         return '0px 0px';
       }
       let scale = 1 / 2;
-      var resultString = icon.position
+      return icon.position
         .split(" ")
         .map(value => {
           var parsedValue = parseInt(value, 10);
@@ -35,7 +36,7 @@ export default {
           return value;
         })
         .join(" ");
-      return resultString;
+      
 
     }
   },

@@ -43,11 +43,12 @@ function getItemFromRecipe(id) {
   return item;
 }
 
-function getRecipes(name) {
+export function getRecipes(name) {
   if (name == 'electronic-circuit-stone') name = 'electronic-circuit';
   try {
     return seData.recipes.filter(r => {
-      return r.out[name]
+      // has object name in output and does not have object name in input
+      return r.out[name] && !Object.keys(r.in).includes(name)
     });
   } catch (e) {
     console.log(e);
@@ -66,8 +67,7 @@ function getAllIngredients(itemNameArray) {
   let allIngredients = new Set();
 
   for (let i = 0; i < itemNameArray.length; i++) {
-    let itemName = itemNameArray[i];
-    let ingredients = getIngredients(itemName);
+    let ingredients = getIngredients( itemNameArray[i]);
 
     for (let j = 0; j < ingredients.length; j++) {
       allIngredients.add(ingredients[j]);
@@ -464,24 +464,25 @@ function createSorter(assemblers) {
 }
 
 // get intermediate products, optionally filtered by a list of producers
-export function getIntermediateProducts(itemList, producerTypes = [], recursive = false) {
+export function getIntermediateProducts(itemList, producerTypes = [], recursive = true) {
+
   //these should be items
   let intermediates = getAllIngredients(itemList);
 
-  //filter out items not produced in these types, and fluids because they're a pain
-  if (producerTypes.length > 0)
-    intermediates = intermediates.filter(m => {
-      let mItem = getSeItem(m);
-      let mRecipe = getRecipes(m)[0];
-      return (producerTypes.some(e => (mRecipe.producers.includes(e))) && mItem.category != 'fluids');
+  if (producerTypes.length > 0) {
+    intermediates = intermediates.filter(itemName => {
+      return (producerTypes.some(e => {
+        return (getRecipes(itemName)[0].producers.includes(e))
+      }));
     });
+  }
+  // get rid of fluids because they're annoying
+  intermediates = intermediates.filter(itemName => (getSeItem(itemName).category != 'fluids'));
 
   if (recursive && intermediates.length > 0) {
-
-    let tertiary = getIntermediateProducts(intermediates, producerTypes, true);
-
-    intermediates = Array.from(new Set(intermediates.concat(tertiary)));
+    intermediates = Array.from(new Set(intermediates.concat(getIntermediateProducts(intermediates, producerTypes, recursive))));
   }
+
   return intermediates;
 }
 
