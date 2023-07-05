@@ -68,10 +68,6 @@
   resolved "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.15.tgz"
   integrity sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==
 
-"@kellbot/factorio-blueprint@github:kellbot/factorio-blueprint#trimmedoutput":
-  version "2.6.7"
-  resolved "git+ssh://git@github.com/kellbot/factorio-blueprint.git#a71e0a9223396bc14d354a096402a02ea9e04484"
-
 "@mdi/font@7.0.96":
   version "7.0.96"
   resolved "https://registry.npmjs.org/@mdi/font/-/font-7.0.96.tgz"
@@ -762,6 +758,10 @@ esutils@^2.0.2, esutils@^2.0.3:
   version "2.0.3"
   resolved "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
+
+"factorio-blueprint@github:kellbot/factorio-blueprint#SushiBranch":
+  version "2.6.4"
+  resolved "git+ssh://git@github.com/kellbot/factorio-blueprint.git#54f7a07f6f7b861eb56a82fb0bce02b88e34b5d0"
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"

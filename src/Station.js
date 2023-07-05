@@ -1,7 +1,7 @@
 
 import { Exception } from 'sass';
 import RailSection from './RailSection';
-import Blueprint from '@kellbot/factorio-blueprint';
+import Blueprint from 'factorio-blueprint';
 
 // const [R, D, L, U, DS, LS] = [
 //     { entity: 'fast-transport-belt', direction: Blueprint.RIGHT },

@@ -1,4 +1,4 @@
-import Blueprint from '@kellbot/factorio-blueprint';
+import Blueprint from 'factorio-blueprint';
 
 export default class RailSection extends Blueprint {
     constructor(parent) {

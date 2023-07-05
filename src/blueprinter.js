@@ -1,4 +1,4 @@
-import Blueprint from '@kellbot/factorio-blueprint';
+import Blueprint from 'factorio-blueprint';
 import seData from './assets/data.json';
 import seBlueprintData from './assets/blueprintData.json';
 

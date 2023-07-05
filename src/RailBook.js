@@ -1,4 +1,4 @@
-import Blueprint from '@kellbot/factorio-blueprint';
+import Blueprint from 'factorio-blueprint';
 import RailSection from './RailSection.js';
 import Station from './Station.js';
 
