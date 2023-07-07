@@ -1,4 +1,5 @@
 import Blueprint from 'factorio-blueprint';
+const {Book} = Blueprint.Book;
 import RailSection from './RailSection.js';
 import Station from './Station.js';
 
@@ -18,8 +19,13 @@ export default class RailBook {
                 this.createCornerBlueprint(),
                 this.createIntersectionT(),
                 this.createIntersectionX(),
-        //        this.createCurveTest(),
-               ].concat(this.createStations());
+                
+               ];
+
+        const stationBooks = [new Book(this.createStations()), new Book(this.createStations('opposite'))];
+        stationBooks[0].name = 'Stations (Same Side)';
+        stationBooks[1].name = 'Stations (Opposite Side)';
+        this.blueprints = this.blueprints.concat(stationBooks);
     }
 
     blankSection() {
@@ -28,12 +34,12 @@ export default class RailBook {
     }
 
 
-    createStations() {
+    createStations(side) {
         let stackSizes = [10, 50, 100, 200];
         let blueprints = [];
         stackSizes.forEach(size => {
-            blueprints.push(Station.loader(this, {name: `Loader [${size}]`, stackSize: size}));
-            blueprints.push(Station.unloader(this, {name: `Unloader [${size}]`, stackSize: size}));
+            blueprints.push(Station.loader(this, {name: `Loader [${size}]`, stackSize: size, side: side}));
+            blueprints.push(Station.unloader(this, {name: `Unloader [${size}]`, stackSize: size, side: side}));
         })
         return blueprints;
     }
@@ -110,7 +116,7 @@ export default class RailBook {
 
     generate() {
         this.blueprints.forEach(bp => {
-            bp.addLandfill();
+            if (bp instanceof Blueprint ) bp.addLandfill();
         });
 
         return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing-2}]`, icons: ['rail', `signal_${(this.trackSpacing-2) % 10}`]}), this.blueprints[0].toJSON()];

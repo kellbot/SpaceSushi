@@ -133,7 +133,7 @@ export default class Station extends RailSection {
         return station;
     }
 
-    addItemHandler(style = "loader") {
+    addItemHandler(style = "loader", side = "same") {
         if (!this.trainStop) throw new Exception("Train stop must be created before buffer belts can be added");
 
         let beltPrint, rotation, bufferPosition, bufferDirection;
@@ -141,12 +141,12 @@ export default class Station extends RailSection {
 
         if (style == 'loader') {
             beltPrint = new Blueprint().load(importStrings.loaderX4);
-            bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.UP : Blueprint.DOWN;
+            bufferDirection = side == 'same' ? Blueprint.UP : Blueprint.DOWN;
         } else {
             beltPrint = new Blueprint().load(importStrings.unloaderX4);
-            bufferDirection = this.parent.bufferSide == 'same' ? Blueprint.DOWN : Blueprint.UP;
+            bufferDirection = side == 'same' ? Blueprint.DOWN : Blueprint.UP;
         }
-        if (this.parent.bufferSide == 'same') {
+        if (side == 'same') {
 
             rotation = Blueprint.ROTATION_NONE;
             bufferPosition = { x: position.x + 1, y: position.y + 7 };
@@ -167,22 +167,22 @@ export default class Station extends RailSection {
         this.trainStop.connect(poles[0], null, null, "green");
     }
 
-    static unloader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
+    static unloader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50, side: 'same' }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
         station.placeStop({ style: 'unloader', stackSize: options.stackSize });
 
-        station.addItemHandler("unloader");
+        station.addItemHandler("unloader", options.side);
 
         return station;
     }
 
-    static loader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50 }) {
+    static loader(parent, options = { name: "Loader [50]", doubleSided: false, flipBelts: false, stackSize: 50, side: 'same' }) {
         let station = Station.basic(parent, false);
         station.name = options.name;
         station.placeStop({ style: 'loader', stackSize: options.stackSize });
 
-        station.addItemHandler("loader");
+        station.addItemHandler("loader", options.side);
 
         return station;
     }

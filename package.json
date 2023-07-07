@@ -13,7 +13,7 @@
   "dependencies": {
     "@mdi/font": "7.0.96",
     "core-js": "^3.29.0",
-    "factorio-blueprint": "github:kellbot/factorio-blueprint#SushiBranch",
+    "factorio-blueprint": "github:kellbot/factorio-blueprint#pub/BlueprintBook",
     "pinia": "^2.0.0",
     "roboto-fontface": "*",
     "vue": "^3.2.0",
