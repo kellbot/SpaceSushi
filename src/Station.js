@@ -19,9 +19,9 @@ export default class Station extends RailSection {
 
     constructor(parent) {
         super(parent);
-        this.engineCount = 1;
-        this.trainLength = 4; //how many cargo / fluid cars
-        this.doubleSided = true;
+        this.engineCount = parent.engineCount;
+        this.trainLength = parent.carCount; //how many cargo / fluid cars
+        this.doubleSided = parent.doubelSided;
         this.engineLength = this.doubleSided ? this.engineCount * 2 * 7 : this.engineCount * 7;
 
         this.cargoStart = { x: this.guides.zero + this.engineCount * 7 + this.globalOffset, y: this.guides.zero + this.globalOffset };
@@ -33,7 +33,7 @@ export default class Station extends RailSection {
     }
 
     placeTrack() {
-        let trackLength = this.engineLength + this.trainLength * 7 - 2;
+        let trackLength = this.engineLength + this.trainLength * 7;
         this.runRail(this.trackStart, { x: this.trackStart.x + trackLength, y: this.trackStart.y });
     }
 

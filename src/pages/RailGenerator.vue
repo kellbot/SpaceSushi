@@ -1,6 +1,5 @@
 <template>
   <v-container>
-
     <v-card>
       <v-card-text>
         Rail generator creates a book of blueprints based on the grid size and track spacing. Track spacing must be a
@@ -17,30 +16,65 @@
     <v-card class="pa-5 my-2">
       <v-row>
         <v-col cols="4">
-          <RailSlider label="Grid Size" :max=52 :min=36 :step=4 v-model="gridSize" />
-          <RailSlider label="Track Spacing" :max=10 :min=4 :step=2 v-model="trackSpacing" />
-          <v-switch v-model="bufferSide" :label="`Buffer Side: ${bufferSide}`"
-          true-value="same"
-    false-value="opposite"></v-switch>
+          <RailSlider
+            label="Grid Size"
+            :max="52"
+            :min="36"
+            :step="4"
+            v-model="gridSize"
+          />
+          <RailSlider
+            label="Track Spacing"
+            :max="10"
+            :min="4"
+            :step="2"
+            v-model="trackSpacing"
+          />
+          <RailSlider
+            label="Engine Count"
+            :max="3"
+            :min="1"
+            :step="1"
+            v-model="engineCount"
+          />
+          <RailSlider
+            label="Car Count"
+            :max="10"
+            :min="1"
+            :step="1"
+            v-model="carCount"
+          />
+          <v-switch
+            v-model="doubleEnded"
+            :label="`Double Ended Trains: ${doubleEnded}`"
+          />
         </v-col>
         <v-col cols="8">
           <v-card-title>Create blueprint with grid size {{ gridSize }}</v-card-title>
           <v-card-text>          
-            <v-btn class="ma-2" @click="generate()">
-            Generate
-          </v-btn>
-          <v-btn class="ma-2" @click="copyCode" :disabled="blueprintString ? false : true">
-            Copy Blueprint to Clipboard
-          </v-btn>
+            <v-btn
+              class="ma-2"
+              @click="generate()"
+            >
+              Generate
+            </v-btn>
+            <v-btn
+              class="ma-2"
+              @click="copyCode"
+              :disabled="blueprintString ? false : true"
+            >
+              Copy Blueprint to Clipboard
+            </v-btn>
 
-          <v-expansion-panels  class="ma-2">
-            <v-expansion-panel title="View Blueprint" :disabled="blueprintString ? false : true" :text="blueprintString">
-            </v-expansion-panel>
-          </v-expansion-panels>
-</v-card-text>
-
+            <v-expansion-panels class="ma-2">
+              <v-expansion-panel
+                title="View Blueprint"
+                :disabled="blueprintString ? false : true"
+                :text="blueprintString"
+              />
+            </v-expansion-panels>
+          </v-card-text>
         </v-col>
-
       </v-row>
     </v-card>
   </v-container>
@@ -54,13 +88,15 @@ export default {
   data: () => ({
     gridSize: 48,// railSettings.gridSize,
     trackSpacing: 8, //railSettings.trackSpacing,
-    bufferSide: 'same',
+    engineCount: 1,
+    carCount: 4,
+    doubleEnded: true,
     blueprintString: null,
     straightJSON: ''
   }),
   methods: {
     generate() {
-      let opts = { gridSize: this.gridSize, trackSpacing: this.trackSpacing, bufferSide: this.bufferSide };
+      let opts = { gridSize: this.gridSize, trackSpacing: this.trackSpacing, doubleEnded: this.doubleEnded, carCount: this.carCount };
       [this.blueprintString, this.straightJSON] = new RailBook(opts).generate();
     },
     async copyCode() {

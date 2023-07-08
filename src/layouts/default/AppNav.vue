@@ -23,7 +23,7 @@
         title="Sushi Strongbox"
         value="sushi"
         link
-        to="/SpaceSushi/sushi-strongbox"
+        to="/SpaceSushi/"
       />
       <v-list-item
         prepend-icon="mdi-train"

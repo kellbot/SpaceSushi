@@ -4,7 +4,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/SpaceSushi/',
-    alias: '/SpaceSushi/sushi-strongbox',
     component: () => import('@/layouts/default/Default.vue'),
     children: [
       {

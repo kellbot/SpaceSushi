@@ -4,12 +4,15 @@ import RailSection from './RailSection.js';
 import Station from './Station.js';
 
 export default class RailBook {
-    constructor({ gridSize = 48, trackSpacing = 8, bufferSide = 'same' } = {}) {
+    constructor({ gridSize = 48, trackSpacing = 8, doubleEnded = true, engineCount =1, carCount = 4 } = {}) {
         // ** These things should be customizable //
         this.trackSpacing = trackSpacing + 2; // The distance between track centers aka two more than the open spaces
         this.gridSize = gridSize; // How big are the grid snaps, defaults to one chunk
         this.wires = true; // include red and green wires
-        this.bufferSide = bufferSide;
+        this.bufferSide = 'same';
+        this.doubleEnded = doubleEnded;
+        this.engineCount = engineCount;
+        this.carCount = carCount;
         // ***** //
 
         this.blueprints =
