@@ -24,10 +24,47 @@
         "inventorySize": 96,
         "filterAmount": false
     },
+    "se_space_assembling_machine": {
+        "type": "item",
+        "width": 3,
+        "height": 3,
+        "recipe": true
+    },
+    "industrial_furnace": {
+        "type": "item",
+        "width": 5,
+        "height": 5,
+        "recipe": true
+    },
+    "se_space_growth_facility": {
+        "type": "item",
+        "width": 9,
+        "height": 9,
+        "recipe": true
+    },
+    "se_space_manufactory": {
+        "type": "item",
+        "width": 9,
+        "height": 9,
+        "recipe": true
+    },
+    "se_space_supercomputer_1": {
+        "type": "item",
+        "width": 5,
+        "height": 5,
+        "recipe": true
+    },
+    "se_space_biochemical_laboratory": {
+        "type": "item",
+        "width": 9,
+        "height": 9,
+        "recipe": true
+    },
     "se_electric_boiler": {
         "type": "item",
         "swidth": 3,
-        "height": 2
+        "height": 2,
+        "recipe": true
     },
     "frozen_snow_0": {
         "type": "tile"

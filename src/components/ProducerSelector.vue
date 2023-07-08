@@ -13,7 +13,7 @@
         <v-sheet class="mx-2 pa-2">
         <v-item-group mandatory multiple selected-class="item-selected" v-model="selectedProducers">
           <template  v-for="producer in producers">
-          <v-item class="ma-2 pa-2" :value="producer.id" v-slot="{ selectedClass, toggle }">
+          <v-item :value="producer.id" v-slot="{ selectedClass, toggle }">
             <ItemButton :item="namedItems[producer.id]" :icon="icons[producer.id]" @click="toggle" :class="['d-flex align-center', selectedClass]" />
           </v-item>
           </template>

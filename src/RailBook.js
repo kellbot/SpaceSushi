@@ -3,8 +3,9 @@ const {Book} = Blueprint.Book;
 import RailSection from './RailSection.js';
 import Station from './Station.js';
 
-export default class RailBook {
+export default class RailBook extends Book {
     constructor({ gridSize = 48, trackSpacing = 8, doubleEnded = true, engineCount =1, carCount = 4 } = {}) {
+        super();
         // ** These things should be customizable //
         this.trackSpacing = trackSpacing + 2; // The distance between track centers aka two more than the open spaces
         this.gridSize = gridSize; // How big are the grid snaps, defaults to one chunk
@@ -15,7 +16,7 @@ export default class RailBook {
         this.carCount = carCount;
         // ***** //
 
-        this.blueprints =
+        this.blueprintData =
             [
                 // Straight rails
                 this.createStraightBlueprint({ label: `Straight Track [${this.gridSize} - ${this.trackSpacing-2}]` }), // Basic straight rail
@@ -23,12 +24,12 @@ export default class RailBook {
                 this.createIntersectionT(),
                 this.createIntersectionX(),
                 
-               ];
+               ].map(bp => ({blueprint: bp}));
 
         const stationBooks = [new Book(this.createStations()), new Book(this.createStations('opposite'))];
         stationBooks[0].name = 'Stations (Same Side)';
         stationBooks[1].name = 'Stations (Opposite Side)';
-        this.blueprints = this.blueprints.concat(stationBooks);
+        this.blueprintData = this.blueprintData.concat(stationBooks.map(bp => ({blueprint_book: bp})));
     }
 
     blankSection() {
@@ -118,8 +119,8 @@ export default class RailBook {
 
 
     generate() {
-        this.blueprints.forEach(bp => {
-            if (bp instanceof Blueprint ) bp.addLandfill();
+        this.blueprintData.forEach(bp => {
+            if (bp.blueprint instanceof Blueprint ) bp.blueprint.addLandfill();
         });
 
         return [Blueprint.toBook(this.blueprints, 0, { autoConnectPoles: false }, {label: `Rails [${this.gridSize} / ${this.trackSpacing-2}]`, icons: ['rail', `signal_${(this.trackSpacing-2) % 10}`]}), this.blueprints[0].toJSON()];

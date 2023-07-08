@@ -1,326 +1,825 @@
-[
-    {
-        "id": "burner-assembling-machine",
-        "name": "Burner assembling machine",
-        "stack": 50,
-        "row": 6,
-        "category": "production",
-        "factory": {
-            "category": "chemical",
-            "pollution": 4,
-            "type": "burner",
-            "usage": 75,
-            "modules": 0,
-            "speed": 0.5
-        }
-    },
-    {
-        "id": "assembling-machine-1",
-        "name": "Assembling machine 1",
-        "stack": 50,
-        "row": 6,
-        "category": "production",
-        "factory": {
-            "drain": 2.5,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 75,
-            "modules": 0,
-            "speed": 0.5
-        }
-    },
-    {
-        "id": "assembling-machine-2",
-        "name": "Assembling machine 2",
-        "stack": 50,
-        "row": 6,
-        "category": "production",
-        "factory": {
-            "drain": 5,
-            "pollution": 3,
-            "type": "electric",
-            "usage": 150,
-            "modules": 2,
-            "speed": 0.75
-        }
-    },
-    {
-        "id": "assembling-machine-3",
-        "name": "Assembling machine 3",
-        "stack": 50,
-        "row": 6,
-        "category": "production",
-        "factory": {
-            "drain": 12.5,
-            "pollution": 2,
-            "type": "electric",
-            "usage": 375,
-            "modules": 4,
-            "speed": 1.25
-        }
-    },
-    {
-        "id": "se-space-assembling-machine",
-        "name": "Space assembling machine",
-        "stack": 50,
-        "row": 6,
-        "category": "production",
-        "factory": {
-            "drain": 12.5,
-            "pollution": 2,
-            "type": "electric",
-            "usage": 375,
-            "modules": 4,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 1.25
-        }
-    },
-     {
-        "id": "se-space-manufactory",
-        "name": "Space manufactory",
-        "stack": 1,
-        "row": 6,
-        "category": "production",
-        "factory": {
-            "drain": 66.666666666667,
-            "pollution": 50,
-            "type": "electric",
-            "usage": 2000,
-            "modules": 6,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 10
-        }
-    },
-    {
-        "id": "oil-refinery",
-        "name": "Oil refinery",
-        "stack": 10,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 14,
-            "pollution": 6,
-            "type": "electric",
-            "usage": 420,
-            "modules": 3,
-            "speed": 1
-        }
-    },
-    {
-        "id": "chemical-plant",
-        "name": "Chemical plant",
-        "stack": 10,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 7,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 210,
-            "modules": 3,
-            "speed": 1
-        }
-    },
-    {
-        "id": "fuel-processor",
-        "name": "Fuel processor",
-        "stack": 50,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "category": "chemical",
-            "pollution": 4,
-            "type": "burner",
-            "usage": 9090.9090909091,
-            "modules": 0,
-            "speed": 1
-        }
-    },
-    {
-        "id": "electric-furnace",
-        "name": "Electric furnace",
-        "stack": 50,
-        "row": 3,
-        "category": "production",
-        "factory": {
-            "drain": 5,
-            "pollution": 0.5,
-            "type": "electric",
-            "usage": 150,
-            "modules": 2,
-            "speed": 2
-        }
-    },
-    {
-        "id": "industrial-furnace",
-        "name": "Industrial furnace",
-        "stack": 20,
-        "row": 3,
-        "category": "production",
-        "factory": {
-            "drain": 16.666666666667,
-            "pollution": 1.5,
-            "type": "electric",
-            "usage": 500,
-            "modules": 5,
-            "speed": 4
-        }
-    },
-    {
-        "id": "se-casting-machine",
-        "name": "Casting machine",
-        "stack": 50,
-        "row": 3,
-        "category": "production",
-        "factory": {
-            "drain": 1.6666666666667,
-            "pollution": 0.25,
-            "type": "electric",
-            "usage": 50,
-            "modules": 2,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 1
-        }
-    },
-    {
-        "id": "se-lifesupport-facility",
-        "name": "Lifesupport facility",
-        "stack": 10,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 33.333333333333,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 1000,
-            "modules": 4,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 1
-        }
-    },
-    {
-        "id": "se-space-biochemical-laboratory",
-        "name": "Biochemical facility",
-        "stack": 5,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 100,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 3000,
-            "modules": 4,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 4
-        }
-    },
-    {
-        "id": "se-pulveriser",
-        "name": "Pulveriser",
-        "stack": 5,
-        "row": 5,
-        "category": "production",
-        "factory": {
-            "drain": 16.666666666667,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 500,
-            "modules": 4,
-            "speed": 2
-        }
-    },
-    {
-        "id": "se-space-decontamination-facility",
-        "name": "Decontamination facility",
-        "stack": 10,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 66.666666666667,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 2000,
-            "modules": 4,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 2
-        }
-    },
-    {
-        "id": "se-space-genetics-laboratory",
-        "name": "Genetics facility",
-        "stack": 5,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 33.333333333333,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 1000,
-            "modules": 4,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 4
-        }
-    },
-    {
-        "id": "se-space-growth-facility",
-        "name": "Growth facility",
-        "stack": 1,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 133.33333333333,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 4000,
-            "modules": 4,
-            "disallowEffects": [
-                "productivity"
-            ],
-            "speed": 4
-        }
-    },
-    {
-        "id": "se-fuel-refinery",
-        "name": "Fuel refinery",
-        "stack": 10,
-        "row": 7,
-        "category": "production",
-        "factory": {
-            "drain": 33.333333333333,
-            "pollution": 6,
-            "type": "electric",
-            "usage": 1000,
-            "modules": 3,
-            "speed": 1
-        }
-    },
-    {
-        "id": "centrifuge",
-        "name": "Centrifuge",
-        "stack": 50,
-        "row": 8,
-        "category": "production",
-        "factory": {
-            "drain": 11.666666666667,
-            "pollution": 4,
-            "type": "electric",
-            "usage": 350,
-            "modules": 2,
-            "speed": 1
-        }
+[{
+    "id": "stone-furnace",
+    "name": "Stone furnace",
+    "stack": 50,
+    "row": 3,
+    "category": "production",
+    "factory": {
+        "category": "chemical",
+        "pollution": 2,
+        "type": "burner",
+        "usage": 90,
+        "modules": 0,
+        "speed": 1
     }
-]
+},
+{
+    "id": "steel-furnace",
+    "name": "Steel furnace",
+    "stack": 50,
+    "row": 3,
+    "category": "production",
+    "factory": {
+        "category": "chemical",
+        "pollution": 4,
+        "type": "burner",
+        "usage": 90,
+        "modules": 0,
+        "speed": 2
+    }
+},
+{
+    "id": "electric-furnace",
+    "name": "Electric furnace",
+    "stack": 50,
+    "row": 3,
+    "category": "production",
+    "factory": {
+        "drain": 5,
+        "pollution": 0.5,
+        "type": "electric",
+        "usage": 150,
+        "modules": 2,
+        "speed": 2
+    }
+},
+{
+    "id": "industrial-furnace",
+    "name": "Industrial furnace",
+    "stack": 20,
+    "row": 3,
+    "category": "production",
+    "factory": {
+        "drain": 16.666666666667,
+        "pollution": 1.5,
+        "type": "electric",
+        "usage": 500,
+        "modules": 5,
+        "speed": 4
+    }
+},
+{
+    "id": "se-casting-machine",
+    "name": "Casting machine",
+    "stack": 50,
+    "row": 3,
+    "category": "production",
+    "factory": {
+        "drain": 1.6666666666667,
+        "pollution": 0.25,
+        "type": "electric",
+        "usage": 50,
+        "modules": 2,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-thermodynamics-laboratory",
+    "name": "Thermodynamics facility",
+    "stack": 5,
+    "row": 3,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 4
+    }
+},
+{
+    "id": "equipment-gantry",
+    "name": "Equipment gantry",
+    "stack": 50,
+    "row": 4,
+    "category": "production",
+    "factory": {
+        "drain": 8.3333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 250,
+        "modules": 0,
+        "speed": 1
+    }
+},
+{
+    "id": "equipment-gantry-remover",
+    "name": "Equipment remover gantry",
+    "stack": 50,
+    "row": 4,
+    "category": "production",
+    "factory": {
+        "drain": 8.3333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 250,
+        "modules": 0,
+        "speed": 1
+    }
+},
+{
+    "id": "se-recycling-facility",
+    "name": "Recycling facility",
+    "stack": 5,
+    "row": 5,
+    "category": "production",
+    "factory": {
+        "drain": 3.3333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 100,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-mechanical-laboratory",
+    "name": "Mechanical facility",
+    "stack": 5,
+    "row": 5,
+    "category": "production",
+    "factory": {
+        "drain": 6.6666666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 200,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-pulveriser",
+    "name": "Pulveriser",
+    "stack": 5,
+    "row": 5,
+    "category": "production",
+    "factory": {
+        "drain": 16.666666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 500,
+        "modules": 4,
+        "speed": 2
+    }
+},
+{
+    "id": "burner-assembling-machine",
+    "name": "Burner assembling machine",
+    "stack": 50,
+    "row": 6,
+    "category": "production",
+    "factory": {
+        "category": "chemical",
+        "pollution": 4,
+        "type": "burner",
+        "usage": 75,
+        "modules": 0,
+        "speed": 0.5
+    }
+},
+{
+    "id": "assembling-machine-1",
+    "name": "Assembling machine 1",
+    "stack": 50,
+    "row": 6,
+    "category": "production",
+    "factory": {
+        "drain": 2.5,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 75,
+        "modules": 0,
+        "speed": 0.5
+    }
+},
+{
+    "id": "assembling-machine-2",
+    "name": "Assembling machine 2",
+    "stack": 50,
+    "row": 6,
+    "category": "production",
+    "factory": {
+        "drain": 5,
+        "pollution": 3,
+        "type": "electric",
+        "usage": 150,
+        "modules": 2,
+        "speed": 0.75
+    }
+},
+{
+    "id": "assembling-machine-3",
+    "name": "Assembling machine 3",
+    "stack": 50,
+    "row": 6,
+    "category": "production",
+    "factory": {
+        "drain": 12.5,
+        "pollution": 2,
+        "type": "electric",
+        "usage": 375,
+        "modules": 4,
+        "speed": 1.25
+    }
+},
+{
+    "id": "se-space-assembling-machine",
+    "name": "Space assembling machine",
+    "stack": 50,
+    "row": 6,
+    "category": "production",
+    "factory": {
+        "drain": 12.5,
+        "pollution": 2,
+        "type": "electric",
+        "usage": 375,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1.25
+    }
+},
+{
+    "id": "se-space-manufactory",
+    "name": "Space manufactory",
+    "stack": 1,
+    "row": 6,
+    "category": "production",
+    "factory": {
+        "drain": 66.666666666667,
+        "pollution": 50,
+        "type": "electric",
+        "usage": 2000,
+        "modules": 6,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 10
+    }
+},
+{
+    "id": "oil-refinery",
+    "name": "Oil refinery",
+    "stack": 10,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 14,
+        "pollution": 6,
+        "type": "electric",
+        "usage": 420,
+        "modules": 3,
+        "speed": 1
+    }
+},
+{
+    "id": "chemical-plant",
+    "name": "Chemical plant",
+    "stack": 10,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 7,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 210,
+        "modules": 3,
+        "speed": 1
+    }
+},
+{
+    "id": "fuel-processor",
+    "name": "Fuel processor",
+    "stack": 50,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "category": "chemical",
+        "pollution": 4,
+        "type": "burner",
+        "usage": 9090.9090909091,
+        "modules": 0,
+        "speed": 1
+    }
+},
+{
+    "id": "se-lifesupport-facility",
+    "name": "Lifesupport facility",
+    "stack": 10,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-biochemical-laboratory",
+    "name": "Biochemical facility",
+    "stack": 5,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 100,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 3000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 4
+    }
+},
+{
+    "id": "se-space-decontamination-facility",
+    "name": "Decontamination facility",
+    "stack": 10,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 66.666666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 2000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 2
+    }
+},
+{
+    "id": "se-space-genetics-laboratory",
+    "name": "Genetics facility",
+    "stack": 5,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 4
+    }
+},
+{
+    "id": "se-space-growth-facility",
+    "name": "Growth facility",
+    "stack": 1,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 133.33333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 4000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 4
+    }
+},
+{
+    "id": "se-fuel-refinery",
+    "name": "Fuel refinery",
+    "stack": 10,
+    "row": 7,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 6,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 3,
+        "speed": 1
+    }
+},
+{
+    "id": "centrifuge",
+    "name": "Centrifuge",
+    "stack": 50,
+    "row": 8,
+    "category": "production",
+    "factory": {
+        "drain": 11.666666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 350,
+        "modules": 2,
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-radiation-laboratory",
+    "name": "Radiation facility",
+    "stack": 5,
+    "row": 8,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-electromagnetics-laboratory",
+    "name": "Electromagnetics facility",
+    "stack": 5,
+    "row": 9,
+    "category": "production",
+    "factory": {
+        "drain": 166.66666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 5000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-laser-laboratory",
+    "name": "Laser facility",
+    "stack": 5,
+    "row": 9,
+    "category": "production",
+    "factory": {
+        "drain": 166.66666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 5000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-material-fabricator",
+    "name": "Material fabricator",
+    "stack": 1,
+    "row": 9,
+    "category": "production",
+    "factory": {
+        "drain": 8333.3333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 250000,
+        "modules": 0,
+        "speed": 4
+    }
+},
+{
+    "id": "se-space-particle-accelerator",
+    "name": "Particle accelerator",
+    "stack": 1,
+    "row": 9,
+    "category": "production",
+    "factory": {
+        "drain": 3333.3333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 100000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-particle-collider",
+    "name": "Particle collider",
+    "stack": 1,
+    "row": 9,
+    "category": "production",
+    "factory": {
+        "drain": 333.33333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 10000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-plasma-generator",
+    "name": "Plasma generator",
+    "stack": 5,
+    "row": 9,
+    "category": "production",
+    "factory": {
+        "drain": 66.666666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 2000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-hypercooler",
+    "name": "Hypercooler",
+    "stack": 15,
+    "row": 10,
+    "category": "production",
+    "factory": {
+        "drain": 6.6666666666667,
+        "pollution": 2,
+        "type": "electric",
+        "usage": 200,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 2
+    }
+},
+{
+    "id": "se-space-radiator",
+    "name": "Thermal radiator",
+    "stack": 50,
+    "row": 10,
+    "category": "production",
+    "factory": {
+        "drain": 3.3333333333333,
+        "pollution": 1,
+        "type": "electric",
+        "usage": 100,
+        "modules": 2,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-radiator-2",
+    "name": "Thermal radiator 2",
+    "stack": 50,
+    "row": 10,
+    "category": "production",
+    "factory": {
+        "drain": 0.66666666666667,
+        "pollution": 1,
+        "type": "electric",
+        "usage": 20,
+        "modules": 2,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 3
+    }
+},
+{
+    "id": "se-space-astrometrics-laboratory",
+    "name": "Astrometrics facility",
+    "stack": 15,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-gravimetrics-laboratory",
+    "name": "Gravimetrics facility",
+    "stack": 15,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-nexus",
+    "name": "Nexus",
+    "stack": 1,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "usage": 0.001,
+        "modules": 0,
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-supercomputer-1",
+    "name": "Supercomputer",
+    "stack": 15,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 2,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-supercomputer-2",
+    "name": "Quantum supercomputer",
+    "stack": 15,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "drain": 83.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 2500,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 2
+    }
+},
+{
+    "id": "se-space-supercomputer-3",
+    "name": "Neural supercomputer",
+    "stack": 15,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "drain": 166.66666666667,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 5000,
+        "modules": 6,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 4
+    }
+},
+{
+    "id": "se-space-supercomputer-4",
+    "name": "Deep supercomputer",
+    "stack": 15,
+    "row": 11,
+    "category": "production",
+    "factory": {
+        "drain": 333.33333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 10000,
+        "modules": 8,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 6
+    }
+},
+{
+    "id": "se-space-telescope",
+    "name": "Telescope",
+    "stack": 50,
+    "row": 12,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 2
+    }
+},
+{
+    "id": "se-space-telescope-gammaray",
+    "name": "Gamma ray telescope",
+    "stack": 15,
+    "row": 12,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-telescope-microwave",
+    "name": "Microwave telescope",
+    "stack": 1,
+    "row": 12,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-telescope-radio",
+    "name": "Radio telescope",
+    "stack": 1,
+    "row": 12,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+},
+{
+    "id": "se-space-telescope-xray",
+    "name": "Xray telescope",
+    "stack": 15,
+    "row": 12,
+    "category": "production",
+    "factory": {
+        "drain": 33.333333333333,
+        "pollution": 4,
+        "type": "electric",
+        "usage": 1000,
+        "modules": 4,
+        "disallowEffects": [
+            "productivity"
+        ],
+        "speed": 1
+    }
+}]

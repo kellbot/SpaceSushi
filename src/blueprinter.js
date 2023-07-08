@@ -1,4 +1,5 @@
 import Blueprint from 'factorio-blueprint';
+const { Book } = Blueprint.Book;
 import seData from './assets/data.json';
 import seBlueprintData from './assets/blueprintData.json';
 
@@ -13,6 +14,7 @@ Blueprint.setEntityData(seBlueprintData);
 
 function humanize(string) {
   let spaces = string.replaceAll('_', ' ');
+  spaces = string.replaceAll('-', ' ');
   return spaces.charAt(0).toUpperCase() + spaces.slice(1);
 }
 
@@ -67,7 +69,7 @@ function getAllIngredients(itemNameArray) {
   let allIngredients = new Set();
 
   for (let i = 0; i < itemNameArray.length; i++) {
-    let ingredients = getIngredients( itemNameArray[i]);
+    let ingredients = getIngredients(itemNameArray[i]);
 
     for (let j = 0; j < ingredients.length; j++) {
       allIngredients.add(ingredients[j]);
@@ -85,125 +87,219 @@ function checkEntity(itemName) {
   }
 }
 
-// creates the storage boxes and assembler for an item, optionally creates a return to the main belt
-function createProducerBlueprint(itemName, beltReturn = false) {
-  checkEntity(itemName);
-  let currentItem = getSeItem(itemName);
-  let obSet = getIngredients(itemName);
-  let recipe = getRecipes(itemName)[0];
-  let fluidCount = 0;
-  const ob = new Blueprint();
-  ob.name = `${humanize(itemName)} Producer`;
-  ob.icons = [itemName.replaceAll('-', '_')];
+export class SushiBook extends Book {
+  constructor( {baseItems, allowedProducers} ) {
+    if (!baseItems.length) throw Error ("Cannot create empty sushi book");
+    super();
+    this.baseItems = baseItems
+    this.producerPrints = [];
+    this.allowedProducers = allowedProducers;
 
-  let combinator = ob.createEntity("constant_combinator", { x: 1, y: -6 });
-  if (recipe.category == 'fluids') return false;
+    this.storedItems = getAllIngredients(baseItems);
 
-  let machine, pipePos;
-  if (recipe.producers.includes('assembling-machine-2')) {
-    ob.icons.push('assembling_machine_2');
-    machine = ob.createEntity('assembling_machine_2', { x: 0, y: -4 });
-    machine.setRecipe(itemName);
-    pipePos = 1;
-  } else if (recipe.producers.includes('chemical-plant')) {
-    machine = ob.createEntity('chemical_plant', { x: 0, y: -4 });
-    machine.setRecipe(itemName);
-    pipePos = 0;
-    ob.icons.push('chemical_plant');
-  } else if (recipe.producers.includes('electric-furnace')) {
-    machine = ob.createEntity('electric_furnace', { x: 0, y: -4 });
-    ob.icons.push('electric_furnace');
-  } else {
+    this.producerPrints.push(createSorter(baseItems));
+    this.addBook(this.createProducerBook());
+    this.addBlueprint(createImportRow(this.storedItems));
+    this.addBlueprint(createPoleRing());
+
+  }
+
+  createProducerBook() {
+    const producerBook = new Book();
+    // //make assemblers 
+    for (let i = 0; i < this.baseItems.length; i++) {
+      let objOutput = this.storedItems.includes(this.baseItems[i]) ? true : false;
+      
+      let producerName = this.firstProducer(this.baseItems[i]);
+      console.log(`Trying to build ${this.baseItems[i]} with ${producerName} `)
+      try {
+       
+        producerBook.addBlueprint(createProducerBlueprint(this.baseItems[i], objOutput, producerName));
+      } catch (e) {
+        console.log(e);
+        console.log(`Problem buliding ${this.baseItems[i]} with ${producerName}`);
+      }
+    }
+    return producerBook;
+  }
+
+  allowedRecipes(itemName) {
+    if (!this.allowedProducers) throw Error("Error: Allowed producers not set");
+       return getRecipes(itemName).filter(
+        recipe => {
+          return recipe.producers.filter(producer => (this.allowedProducers.includes(producer))).length
+        });
+
+  }
+
+  firstProducer(itemName) {
+    let producers = [];
+    console.log(this.allowedProducers);
+    getRecipes(itemName).forEach(
+      recipe => {
+        producers = producers.concat(recipe.producers.filter(producer => (this.allowedProducers.includes(producer))));
+        
+      });
+      return producers[0]
+;  }
+  
+  createSorter() {
+    throw Error("You didn't implement this");
+  }
+  createImportRow() {
+    throw Error("You didn't implement this");
+  }
+  createPoleRing() {
+    throw Error("You didn't implement this");
+  }
+}
+
+class ProducerPrint extends Blueprint {
+  constructor({ itemName: itemName, producerName: producerName, beltReturn: beltReturn } = {}) {
+    if(!producerName) throw Error ("Must provide producer name")
+    super();
+    this.produerName = producerName;
+    this.itemName = itemName;
+    this.beltReturn = beltReturn || false;
+    this.name = `${humanize(itemName)} Producer`;
+    this.icons = [itemName.replaceAll('-', '_')];
+    this.icons.push(producerName.replaceAll('-', '_'));
+    this.ingredients =  getIngredients(itemName);
+
+    this.producerPosition = ProducerPrint.calculatePositon(producerName);
+
+    this.combinator = this.createEntity("constant_combinator", { x: 1, y: -2 + this.producerPosition.y });
+
+    this.producer = this.createEntity(producerName, this.producerPosition);
+    this.producer.setRecipe(itemName);
+    this.returnPos = this.producerPosition.w <= this.ingredients.length ? this.ingredients.length : this.producerPosition.w;
+    this.pipes = ProducerPrint.calculatePipeOutlets(producerName);
+
+     //add a power pole for easy connections
+     this.pole = this.createEntity("medium_electric_pole", { x: 0, y: -2 + this.producerPosition.y });
+
+     // Ingredient Buffers
+    
+    let lastChest;
+    //for each ingredient in the recipe
+    let j;
+    for (j = 0; j < this.ingredients.length; j++) {
+      let xPos = (j == 4) ? j + 1 : j;
+      let activeItem = getSeItem(this.ingredients[j]);
+      // if it's stackabke, set a limit and build a chest
+      if (activeItem.stack) {
+        this.combinator.setConstant(j, activeItem.id, (activeItem.stack * -1) + 10);
+        let chest = this.createEntity('steel_chest', { x: xPos, y: 0 });
+        chest.setBar(1);
+        let sfi = this.createEntity('stack_filter_inserter', { x: xPos, y: 1 }, Blueprint.DOWN);
+        this.createEntity('fast_inserter', { x: xPos, y: -1 }, Blueprint.DOWN);
+
+        sfi.setFilter(0, activeItem.id);
+
+        // wider than assembler
+        if (j == this.producerPosition.w + 1) {
+          this.createEntity("fast_transport_belt", { x: xPos, y: -2 }, Blueprint.RIGHT);
+          this.createEntity("fast_transport_belt", { x: xPos + 1, y: -2 }, Blueprint.UP);
+          this.createEntity("fast_transport_belt", { x: xPos + 1, y: -3 }, Blueprint.UP);
+          this.createEntity("fast_inserter", { x: xPos, y: -3 }, Blueprint.RIGHT);
+        }
+        if (j== this.producerPosition.w + 2) {
+          this.createEntity("fast_transport_belt", { x: xPos, y: -2 }, Blueprint.LEFT);
+        }
+
+        //if there is another chest in this group connect to it with red wire
+        if (lastChest) {
+          chest.connect(lastChest, null, null, "red");
+        }
+
+        //increase the combinator totals
+        lastChest = chest;
+
+        //add a pipe to ground for fluids
+      } else if (activeItem.category == "fluids" && this.pipes) {
+
+        this.pipes.forEach(pipeX => {
+
+          this.createEntity("pipe_to_ground", { x: pipeX, y: this.producerPosition - 1 }, Blueprint.DOWN);
+          this.createEntity("pipe_to_ground", { x: pipeX, y: this.producerPosition - 4 }, Blueprint.UP);
+
+        })
+      }
+    }
+   
+     this.pole.connect(lastChest, null, null, "red");
+
+     // Return to main sushi belt
+
+    if (this.beltReturn) {
+      let returnPos = this.returnPos;
+
+      let currentItem = getSeItem(itemName);
+      
+      if (returnPos == 2 && this.producerPosition.y > -6){
+        this.createEntity("fast_underground_belt", { x: returnPos, y: -2 + this.producerPosition.y }, Blueprint.DOWN);
+        this.createEntity("fast_underground_belt", { x: returnPos, y: -1 }, Blueprint.DOWN).setDirectionType("output");
+        this.createEntity("fast_transport_belt", { x: returnPos, y: 0 }, Blueprint.DOWN);
+      } else {
+      
+        //return belt
+  
+        this.createEntity("fast_transport_belt", { x: 2, y: -2 + this.producerPosition.y }, Blueprint.RIGHT);
+  
+        this.createEntity("fast_transport_belt", { x: 3, y: -2 + this.producerPosition.y }, Blueprint.DOWN);
+        for (let yPos = -5; yPos < 1; yPos++) {
+          this.createEntity("fast_transport_belt", { x: returnPos, y: yPos }, Blueprint.DOWN);
+        }
+      }
+      
+      //output arm
+      this.createEntity('stack_inserter', { x: returnPos, y: 1 }, Blueprint.UP).connect(this.pole, null, null, "green").setCondition({
+        left: itemName,
+        right: currentItem.stack * 5,
+        operator: "<"
+      });
+    } else {
+      this.createEntity("logistic_chest_passive_provider", { x: 2, y:this.producerPosition.y - 2  }).setBar(1);
+
+  
+    }
+
+    this.createEntity("fast_inserter", { x: 2, y: this.producerPosition.y - 1  }, Blueprint.DOWN);
+
+  this.combinator.connect(this.pole, null, null, "red");
+
+
+
+
+  }
+
+  static calculatePositon(producerName) {
+    let producer = Blueprint.getEntityData()[producerName.replaceAll('-', '_')];
+
+    return {x: 0, y: -1 - producer.height, w: producer.width};
+
+  }
+  static calculatePipeOutlets(producerName) {
+    let middle = ['assembling-machine-1', 'assembling-machine-2', 'assembling-machine-3', 'burner-assembling-machine'];
+    if (middle.includes(producerName)) return [1];
+    let threeboth = ['chemical-plant'];
+    if (threeboth.includes(producerName)) return [0, 2];
     return false;
   }
 
-  let lastChest;
-  //for each ingredient in the recipe
-  let j;
-  for (j = 0; j < obSet.length; j++) {
-    let xPos = (j == 4) ? j + 1 : j;
-    let activeItem = getSeItem(obSet[j]);
-    // if it's stackabke, set a limit and build a chest
-    if (activeItem.stack) {
-      combinator.setConstant(j, activeItem.id, (activeItem.stack * -1) + 10);
-      let chest = ob.createEntity('steel_chest', { x: xPos, y: 0 });
-      chest.setBar(1);
-      let sfi = ob.createEntity('stack_filter_inserter', { x: xPos, y: 1 }, Blueprint.DOWN);
-      ob.createEntity('fast_inserter', { x: xPos, y: -1 }, Blueprint.DOWN);
-
-      sfi.setFilter(0, activeItem.id);
-
-      // wider than assembler
-      if (j == 3) {
-        ob.createEntity("fast_transport_belt", { x: xPos, y: -2 }, Blueprint.RIGHT);
-        ob.createEntity("fast_transport_belt", { x: xPos + 1, y: -2 }, Blueprint.UP);
-        ob.createEntity("fast_transport_belt", { x: xPos + 1, y: -3 }, Blueprint.UP);
-        ob.createEntity("fast_inserter", { x: xPos, y: -3 }, Blueprint.RIGHT);
-      }
-      if (j == 4) {
-        ob.createEntity("fast_transport_belt", { x: xPos, y: -2 }, Blueprint.LEFT);
-      }
-
-      //if there is another chest in this group connect to it with red wire
-      if (lastChest) {
-        chest.connect(lastChest, null, null, "red");
-      }
-
-      //increase the combinator totals
-      lastChest = chest;
-
-      //add a pipe to ground for fluids
-    } else if (activeItem.category == "fluids") {
-      fluidCount++;
-      // We don't support multiple fluids
-      if (fluidCount > 1) return false;
-      ob.createEntity("pipe_to_ground", { x: pipePos, y: -5 }, Blueprint.DOWN);
-      ob.createEntity("pipe_to_ground", { x: pipePos, y: -7 }, Blueprint.UP);
-
-    }
-  }
+}
 
 
+// creates the storage boxes and assembler for an item, optionally creates a return to the main belt
+function createProducerBlueprint(itemName, beltReturn = false, producerName = 'assembling-machine-2') {
+  checkEntity(itemName);
+  
+  let recipe = getRecipes(itemName)[0];
+  
 
-  //add a power pole for easy connections
-  let pole = ob.createEntity("medium_electric_pole", { x: 0, y: -6 });
-  pole.connect(lastChest, null, null, "red");
+  if (recipe.category == 'fluids') return false;
+  const ob = new ProducerPrint({ itemName: itemName, producerName, beltReturn: beltReturn });
 
-  combinator.connect(pole, null, null, "red");
-
-  let returnPos;
-  if (beltReturn) {
-    if (obSet.length > 3) return;
-    //place it under the assembler if there's room, next to it if not
-    if (obSet.length < 3) {
-      returnPos = 2;
-      ob.createEntity("fast_underground_belt", { x: returnPos, y: -6 }, Blueprint.DOWN);
-      ob.createEntity("fast_underground_belt", { x: returnPos, y: -1 }, Blueprint.DOWN).setDirectionType("output");
-      ob.createEntity("fast_transport_belt", { x: returnPos, y: 0 }, Blueprint.DOWN);
-
-    } else {
-      returnPos = 3;
-      //return belt
-
-      ob.createEntity("fast_transport_belt", { x: 2, y: -6 }, Blueprint.RIGHT);
-
-      ob.createEntity("fast_transport_belt", { x: 3, y: -6 }, Blueprint.DOWN);
-      for (let yPos = -5; yPos < 1; yPos++) {
-        ob.createEntity("fast_transport_belt", { x: returnPos, y: yPos }, Blueprint.DOWN);
-      }
-
-    }
-    //output arm
-    ob.createEntity('stack_inserter', { x: returnPos, y: 1 }, Blueprint.UP).connect(pole, null, null, "green").setCondition({
-      left: itemName,
-      right: currentItem.stack * 5,
-      operator: "<"
-    });
-  } else {
-    ob.createEntity("logistic_chest_passive_provider", { x: 2, y: -6 }).setBar(1);
-
-  }
-  ob.createEntity("fast_inserter", { x: 2, y: -5 }, Blueprint.DOWN);
 
   return ob;
 }
@@ -487,30 +583,12 @@ export function getIntermediateProducts(itemList, producerTypes = [], recursive 
 }
 
 
-function createBook(assemblers) {
-  let obPrints = [];
 
-  let storedItems = getAllIngredients(assemblers);
 
-  obPrints.push(createSorter(assemblers));
-  obPrints.push(createImportRow(assemblers));
-  obPrints.push(createPoleRing());
-  //make assemblers 
-  for (let i = 0; i < assemblers.length; i++) {
-    let objOutput = storedItems.includes(assemblers[i]) ? true : false;
-    try {
-      obPrints.push(createProducerBlueprint(assemblers[i], objOutput));
-    } catch (e) {
-      console.log(e);
-      console.log(`Problem buliding ${assemblers[i]}`);
-    }
-  }
 
-  return obPrints;
-}
 
-export function getBlueprintString(assemblerList) {
-  return Blueprint.toBook(createBook(assemblerList));
+export function getBlueprintString(assemblerList, selectedProducers) {
+  return new SushiBook({baseItems: assemblerList, allowedProducers: selectedProducers}).encode();
 }
 
 export default { getBlueprintString, getIntermediateProducts };

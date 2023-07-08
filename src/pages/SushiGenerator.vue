@@ -63,7 +63,6 @@ import { getBlueprintString, getIntermediateProducts } from '@/blueprinter.js';
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia'
 
-
 import { namedIcons, namedItems } from '@/shared';
 
 let appStore = useAppStore();
@@ -85,10 +84,10 @@ export default {
        true);
     },
     createBlueprintString() {
-      return getBlueprintString(Array.from(new Set(this.selectedItems.concat(this.intermedateItems(this.selectedItems)))))
+      return getBlueprintString(Array.from(new Set(this.selectedItems.concat(this.intermedateItems(this.selectedItems)))),  Array.from(this.selectedProducers))
     },
     generate() {
-      this.blueprintString = this.createBlueprintString(this.selectedItems);
+      this.blueprintString = this.createBlueprintString();
     },
     async copyCode() {
       await navigator.clipboard.writeText(this.blueprintString);
