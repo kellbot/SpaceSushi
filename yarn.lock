@@ -759,9 +759,8 @@ esutils@^2.0.2, esutils@^2.0.3:
   resolved "https://registry.npmjs.org/esutils/-/esutils-2.0.3.tgz"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-"factorio-blueprint@github:kellbot/factorio-blueprint#pub/BlueprintBook":
-  version "2.6.4"
-  resolved "git+ssh://git@github.com/kellbot/factorio-blueprint.git#50cd78e77e919476b8da90765a7b7608a7df4801"
+factorio-blueprint@@kellbot/factorio-bluperint:
+  resolved "file:@kellbot/factorio-bluperint"
 
 fast-deep-equal@^3.1.1, fast-deep-equal@^3.1.3:
   version "3.1.3"
